@@ -1,3 +1,5 @@
+
+
 <?php
 session_start();
 if (!isset($_SESSION['Admin-name'])) {
@@ -7,11 +9,11 @@ if (!isset($_SESSION['Admin-name'])) {
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Manage Users</title>
+	<title>Manage Goods</title>
   	<meta charset="utf-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1">
   	<link rel="icon" type="image/png" href="images/favicon.png">
-	<link rel="stylesheet" type="text/css" href="css/manageusers.css">
+	<link rel="stylesheet" type="text/css" href="css/managegoods.css">
 
     <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.3.1.js"
@@ -20,7 +22,7 @@ if (!isset($_SESSION['Admin-name'])) {
 	</script>
     <script type="text/javascript" src="js/bootbox.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.js"></script>
-	<script src="js/manage_users.js"></script>
+	<script src="js/manage_goods.js"></script>
 	<script>
 	  	$(window).on("load resize ", function() {
 		    var scrollWidth = $('.tbl-content').width() - $('.tbl-content table').width();
@@ -30,15 +32,15 @@ if (!isset($_SESSION['Admin-name'])) {
 	<script>
 	  $(document).ready(function(){
 	  	  $.ajax({
-	        url: "manage_users_up.php"
+	        url: "manage_goods_up.php"
 	        }).done(function(data) {
-	        $('#manage_users').html(data);
+	        $('#manage_goods').html(data);
 	      });
 	    setInterval(function(){
 	      $.ajax({
-	        url: "manage_users_up.php"
+	        url: "manage_goods_up.php"
 	        }).done(function(data) {
-	        $('#manage_users').html(data);
+	        $('#manage_goods').html(data);
 	      });
 	    },5000);
 	  });
@@ -53,15 +55,15 @@ if (!isset($_SESSION['Admin-name'])) {
 			<div class="alert_user"></div>
 			<fieldset>
 				<legend><span class="number">1</span> Goods Info</legend>
-				<input type="hidden" name="user_id" id="user_id">
-				<input type="text" name="name" id="name" placeholder="Identify...">
+				<input type="hidden" name="good_id" id="good_id">
+				<input type="text" name="good" id="good" placeholder="Identify...">
 				<input type="text" name="number" id="number" placeholder="Serial Number...">
-				<input type="email" name="email" id="email" placeholder="Good origin...">
+				<input type="text" name="origin" id="origin" placeholder="Good origin...">
 			</fieldset>
 			<fieldset>
 			<legend><span class="number">2</span> Additional Info</legend>
 			<label>
-				<label for="Device"><b>Goods Department:</b></label>
+				<label for="Device"><b>Good Department:</b></label>
                     <select class="dev_sel" name="dev_sel" id="dev_sel" style="color: #000;">
                       <option value="0">All Departments</option>
                       <?php
@@ -87,9 +89,9 @@ if (!isset($_SESSION['Admin-name'])) {
 
 	      	</label >
 			</fieldset>
-			<button type="button" name="user_add" class="user_add">Add Goods</button>
-			<button type="button" name="user_upd" class="user_upd">Update Goods</button>
-			<button type="button" name="user_rmo" class="user_rmo">Remove Goods</button>
+			<button type="button" name="good_add" class="good_add">Add Goods</button>
+			<button type="button" name="good_upd" class="good_upd">Update Goods</button>
+			<button type="button" name="good_rmo" class="good_rmo">Remove Goods</button>
 		</form>
 	</div>
 
@@ -97,7 +99,7 @@ if (!isset($_SESSION['Admin-name'])) {
 	<div class="section">
 		
 		<div class="slideInRight animated">
-			<div id="manage_users"></div>
+			<div id="manage_goods"></div>
 		</div>
 	</div>
 </main>

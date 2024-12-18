@@ -1,3 +1,5 @@
+
+
 <?php
 session_start();
 if (!isset($_SESSION['Admin-name'])) {
@@ -7,11 +9,11 @@ if (!isset($_SESSION['Admin-name'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Users Logs</title>
+    <title>Goods Logs</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- <link rel="icon" type="image/png" href="icon/ok_check.png"> -->
-    <link rel="stylesheet" type="text/css" href="css/userslog.css">
+    <link rel="stylesheet" type="text/css" href="css/goodslog.css">
 
     <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.js"
@@ -20,7 +22,7 @@ if (!isset($_SESSION['Admin-name'])) {
     </script>   
     <script type="text/javascript" src="js/bootbox.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.js"></script>
-    <script src="js/user_log.js"></script>
+    <script src="js/good_log.js"></script>
     <script>
       $(window).on("load resize ", function() {
         var scrollWidth = $('.tbl-content').width() - $('.tbl-content table').width();
@@ -32,38 +34,38 @@ if (!isset($_SESSION['Admin-name'])) {
       let intervalID;
 
       // Hàm gửi yêu cầu AJAX để cập nhật bảng user_log
-      function fetchUserLogs(selectDate) {
+      function fetchGoodLogs(selectDate) {
         $.ajax({
-          url: "user_log_up.php",
+          url: "good_log_up.php",
           type: 'POST',
           data: { 'select_date': selectDate },
           success: function (data) {
-            $('#userslog').html(data);
+            $('#goodslog').html(data);
           },
           error: function () {
-            console.error("Failed to fetch user logs.");
+            console.error("Failed to fetch good logs.");
           },
         });
       }
 
       // Cập nhật bảng user_log ngay khi trang được tải
-      fetchUserLogs(1);
+      fetchGoodLogs(1);
 
       // Hàm cập nhật bảng user_log nếu Live Update bật
       function updateTable() {
         if ($('#liveToggle').is(':checked')) {
-          fetchUserLogs(0);
+          fetchGoodLogs(0);
         }
       }
 
       // Thiết lập cập nhật tự động mỗi 5 giây nếu Live Update bật
-      intervalID = setInterval(updateTable, 5000);
+      intervalID = setInterval(updateTable, 1000);
 
       // Bắt sự kiện thay đổi trạng thái của nút Live (toggle)
       $('#liveToggle').on('change', function () {
         if ($(this).is(':checked')) {
           // Bật Live Update
-          intervalID = setInterval(updateTable, 5000);
+          intervalID = setInterval(updateTable, 1000);
         } else {
           // Tắt Live Update
           clearInterval(intervalID);
@@ -77,7 +79,7 @@ if (!isset($_SESSION['Admin-name'])) {
 <?php include'header.php'; ?> 
 <section class="container py-lg-5">>
   <!--User table-->
-    <h1 class="slideInDown animated">Here are the Users daily logs</h1>
+    <h1 class="slideInDown animated">Here are the Goods daily logs</h1>
     <div class="form-style-5">
       <button type="button" data-toggle="modal" data-target="#Filter-export">Log Filter/ Export to Excel</button>
       <input type="checkbox" id="liveToggle" checked> Live Update
@@ -87,7 +89,7 @@ if (!isset($_SESSION['Admin-name'])) {
       <div class="modal-dialog modal-dialog-centered modal-lg animate" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 class="modal-title" id="exampleModalLongTitle">Filter Your User Log:</h3>
+            <h3 class="modal-title" id="exampleModalLongTitle">Filter Your Goods Log:</h3>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -129,12 +131,12 @@ if (!isset($_SESSION['Admin-name'])) {
                 </div>
                 <div class="row">
                   <div class="col-lg-4 col-sm-12">
-                    <label for="Fingerprint"><b>Filter By User:</b></label>
+                    <label for="Fingerprint"><b>Filter By Goods:</b></label>
                     <select class="card_sel" name="card_sel" id="card_sel">
-                      <option value="0">All Users</option>
+                      <option value="0">All Goods</option>
                       <?php
                         require'connectDB.php';
-                        $sql = "SELECT * FROM users WHERE add_card=1 ORDER BY id ASC";
+                        $sql = "SELECT * FROM goods WHERE add_card=1 ORDER BY id ASC";
                         $result = mysqli_stmt_init($conn);
                         if (!mysqli_stmt_prepare($result, $sql)) {
                             echo '<p class="error">SQL Error</p>';
@@ -144,7 +146,7 @@ if (!isset($_SESSION['Admin-name'])) {
                             $resultl = mysqli_stmt_get_result($result);
                             while ($row = mysqli_fetch_assoc($resultl)){
                       ?>
-                              <option value="<?php echo $row['card_uid'];?>"><?php echo $row['username']; ?></option>
+                              <option value="<?php echo $row['card_uid'];?>"><?php echo $row['good']; ?></option>
                       <?php
                             }
                         }
@@ -182,7 +184,7 @@ if (!isset($_SESSION['Admin-name'])) {
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" name="user_log" id="user_log" class="btn btn-success">Filter</button>
+              <button type="button" name="good_log" id="good_log" class="btn btn-success">Filter</button>
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
             </div>
           </form>
@@ -191,7 +193,7 @@ if (!isset($_SESSION['Admin-name'])) {
     </div>
     <!-- //Log filter -->
     <div class="slideInRight animated">
-      <div id="userslog"></div>
+      <div id="goodslog"></div>
     </div>
 </section>
 </main>

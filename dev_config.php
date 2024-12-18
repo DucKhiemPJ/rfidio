@@ -1,3 +1,5 @@
+
+
 <?php 
 session_start();
 require('connectDB.php');
@@ -93,7 +95,7 @@ elseif (isset($_POST['update'])) {
         exit();
     }
     else{
-        $sql = "SELECT * FROM users WHERE user_email=?";  
+        $sql = "SELECT * FROM goods WHERE origin=?";  
         $result = mysqli_stmt_init($conn);
         if ( !mysqli_stmt_prepare($result, $sql)){
             header("location: account.php?error=sqlerror1");
@@ -111,7 +113,7 @@ elseif (isset($_POST['update'])) {
                 }
                 else if ($pwdCheck == true) {
                     if ($useremail == $up_email) {
-                        $sql = "UPDATE users SET user_name=? WHERE user_email=?";
+                        $sql = "UPDATE goods SET good=? WHERE origin=?";
                         $stmt = mysqli_stmt_init($conn);
                         if (!mysqli_stmt_prepare($stmt, $sql)) {
                             header("location: account.php?error=sqlerror");
@@ -126,7 +128,7 @@ elseif (isset($_POST['update'])) {
                         }
                     }
                     else{
-                        $sql = "SELECT user_email FROM users WHERE user_email=?";  
+                        $sql = "SELECT origin FROM goods WHERE origin=?";  
                         $result = mysqli_stmt_init($conn);
                         if ( !mysqli_stmt_prepare($result, $sql)){
                             header("location: account.php?error=sqlerror1");
@@ -137,7 +139,7 @@ elseif (isset($_POST['update'])) {
                             mysqli_stmt_execute($result);
                             $resultl = mysqli_stmt_get_result($result);
                             if (!$row = mysqli_fetch_assoc($resultl)) {
-                                $sql = "UPDATE users SET user_name=?, user_email=? WHERE user_email=?";
+                                $sql = "UPDATE goods SET good=?, origin=? WHERE origin=?";
                                 $stmt = mysqli_stmt_init($conn);
                                 if (!mysqli_stmt_prepare($stmt, $sql)) {
                                     header("location: account.php?error=sqlerror");

@@ -1,3 +1,5 @@
+
+
 <?php  
 session_start();
 ?>
@@ -6,7 +8,7 @@ session_start();
     <thead class="table-primary">
       <tr>
         <th>ID</th>
-        <th>Name</th>
+        <th>Goods</th>
         <th>Serial Number</th>
         <th>Card UID</th>
         <th>Device Dep</th>
@@ -71,7 +73,7 @@ session_start();
         }
 
         // Construct SQL query
-        $sql = "SELECT * FROM users_logs WHERE " . implode(' AND ', $conditions) . " ORDER BY id DESC";
+        $sql = "SELECT * FROM goods_logs WHERE " . implode(' AND ', $conditions) . " ORDER BY id DESC";
         $stmt = mysqli_prepare($conn, $sql);
         
         if ($stmt) {
@@ -89,7 +91,7 @@ session_start();
         ?>
                   <tr>
                   <td><?php echo htmlspecialchars($row['id']); ?></td>
-                  <td><?php echo htmlspecialchars($row['username']); ?></td>
+                  <td><?php echo htmlspecialchars($row['good']); ?></td>
                   <td><?php echo htmlspecialchars($row['serialnumber']); ?></td>
                   <td><?php echo htmlspecialchars($row['card_uid']); ?></td>
                   <td><?php echo htmlspecialchars($row['device_dep']); ?></td>

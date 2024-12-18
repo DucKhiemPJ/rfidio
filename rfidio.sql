@@ -12,7 +12,6 @@ SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -29,11 +28,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admin` (
-  `id` int(11) NOT NULL,
-  `admin_name` varchar(30) NOT NULL,
-  `admin_email` varchar(80) NOT NULL,
-  `admin_pwd` longtext NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 ;
+  `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `admin_name` VARCHAR(30) NOT NULL,
+  `admin_email` VARCHAR(80) NOT NULL,
+  `admin_pwd` LONGTEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `admin`
@@ -49,13 +48,13 @@ INSERT INTO `admin` (`id`, `admin_name`, `admin_email`, `admin_pwd`) VALUES
 --
 
 CREATE TABLE `devices` (
-  `id` int(11) NOT NULL,
-  `device_name` varchar(50) NOT NULL,
-  `device_dep` varchar(20) NOT NULL,
-  `device_uid` text NOT NULL,
-  `device_date` date NOT NULL,
-  `device_mode` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `device_name` VARCHAR(50) NOT NULL,
+  `device_dep` VARCHAR(20) NOT NULL,
+  `device_uid` TEXT NOT NULL,
+  `device_date` DATE NOT NULL,
+  `device_mode` TINYINT(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -63,19 +62,19 @@ CREATE TABLE `devices` (
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `username` varchar(30) NOT NULL DEFAULT 'None',
-  `serialnumber` double NOT NULL DEFAULT '0',
-  `gender` varchar(10) NOT NULL DEFAULT 'None',
-  `email` varchar(50) NOT NULL DEFAULT 'None',
-  `card_uid` varchar(30) NOT NULL,
-  `card_select` tinyint(1) NOT NULL DEFAULT '0',
-  `user_date` date NOT NULL,
-  `device_uid` varchar(20) NOT NULL DEFAULT '0',
-  `device_dep` varchar(20) NOT NULL DEFAULT '0',
-  `add_card` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `goods` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `good` VARCHAR(30) NOT NULL DEFAULT 'None',
+  `serialnumber` DOUBLE NOT NULL DEFAULT '0',
+  `fragile` VARCHAR(11) NOT NULL DEFAULT 'None',
+  `origin` VARCHAR(50) NOT NULL DEFAULT 'None',
+  `card_uid` VARCHAR(30) NOT NULL,
+  `card_select` TINYINT(1) NOT NULL DEFAULT '0',
+  `good_date` DATE NOT NULL,
+  `device_uid` VARCHAR(20) NOT NULL DEFAULT '0',
+  `device_dep` VARCHAR(20) NOT NULL DEFAULT '0',
+  `add_card` TINYINT(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -83,9 +82,9 @@ CREATE TABLE `users` (
 -- Table structure for table `users_logs`
 --
 
-CREATE TABLE `users_logs` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `username` VARCHAR(100) NOT NULL,
+CREATE TABLE `goods_logs` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `good` VARCHAR(100) NOT NULL,
   `serialnumber` BIGINT NOT NULL,
   `card_uid` VARCHAR(30) NOT NULL,
   `device_uid` VARCHAR(20) NOT NULL,
@@ -93,67 +92,9 @@ CREATE TABLE `users_logs` (
   `checkindate` DATE NOT NULL,
   `timein` TIME NOT NULL,
   `timeout` TIME NOT NULL DEFAULT '00:00:00',
-  `card_out` TINYINT(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  `card_out` TINYINT(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `admin`
---
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `devices`
---
-ALTER TABLE `devices`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `users_logs`
---
-ALTER TABLE `users_logs`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `admin`
---
-ALTER TABLE `admin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `devices`
---
-ALTER TABLE `devices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `users_logs`
---
-ALTER TABLE `users_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

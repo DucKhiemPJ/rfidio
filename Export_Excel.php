@@ -1,3 +1,5 @@
+
+
 <?php
 //Connect to database
 require'connectDB.php';
@@ -70,7 +72,7 @@ if(isset($_POST["To_Excel"])){
         $_SESSION['searchQuery'] .= " AND device_uid='".$dev_uid."'";
     }
 
-    $sql = "SELECT * FROM users_logs WHERE ".$_SESSION['searchQuery']." ORDER BY id DESC";
+    $sql = "SELECT * FROM goods_logs WHERE ".$_SESSION['searchQuery']." ORDER BY id DESC";
     $result = mysqli_query($conn, $sql);
     if($result->num_rows > 0){
       $output .= '
@@ -90,7 +92,7 @@ if(isset($_POST["To_Excel"])){
             $output .= '
                         <TR> 
                             <TD> '.$row['id'].'</TD>
-                            <TD> '.$row['username'].'</TD>
+                            <TD> '.$row['good'].'</TD>
                             <TD> '.$row['serialnumber'].'</TD>
                             <TD> '.$row['card_uid'].'</TD>
                             <TD> '.$row['device_uid'].'</TD>
@@ -108,7 +110,7 @@ if(isset($_POST["To_Excel"])){
         exit();
     }
     else{
-      header( "location: UsersLog.php" );
+      header( "location: GoodsLog.php" );
       exit();
     }
 }

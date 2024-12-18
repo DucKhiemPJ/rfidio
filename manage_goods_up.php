@@ -1,10 +1,12 @@
+
+
 <div class="table-responsive-sm" style="max-height: 870px;"> 
   <table class="table">
     <thead class="table-primary">
       <tr>
         <th>Card UID</th>
-        <th>Goods</th>
-        <th>Category</th>
+        <th>Good</th>
+        <th>Fragile</th>
         <th>S.No</th>
         <th>Date</th>
         <th>Department</th>
@@ -15,7 +17,7 @@
       //Connect to database
       require'connectDB.php';
 
-        $sql = "SELECT * FROM users ORDER BY id DESC";
+        $sql = "SELECT * FROM goods ORDER BY id DESC";
         $result = mysqli_stmt_init($conn);
         if (!mysqli_stmt_prepare($result, $sql)) {
             echo '<p class="error">SQL Error</p>';
@@ -37,10 +39,10 @@
                     		<button type="button" class="select_btn" id="<?php echo $card_uid;?>" title="select this UID"><?php echo $card_uid;?></button>
                     	</form>
                     </TD>
-                  <TD><?php echo $row['username'];?></TD>
-                  <TD><?php echo $row['gender'];?></TD>
+                  <TD><?php echo $row['good'];?></TD>
+                  <TD><?php echo $row['fragile'];?></TD>
                   <TD><?php echo $row['serialnumber'];?></TD>
-                  <TD><?php echo $row['user_date'];?></TD>
+                  <TD><?php echo $row['good_date'];?></TD>
                   <TD><?php echo ($row['device_dep'] == "0") ? "All" : $row['device_dep'];?></TD>
                   </TR>
     <?php

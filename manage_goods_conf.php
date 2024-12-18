@@ -1,37 +1,39 @@
+
+
 <?php  
 // Kết nối đến cơ sở dữ liệu
 require 'connectDB.php';
 
 // Thêm người dùng
 if (isset($_POST['Add'])) {
-    $user_id = $_POST['user_id'];
-    $Uname = $_POST['name'];
+    $Good_id = $_POST['good_id'];
+    $Gname = $_POST['good'];
     $Number = $_POST['number'];
-    $Email = $_POST['email'];
+    $Origin = $_POST['origin'];
     $dev_uid = $_POST['dev_uid'];
-    $Gender = $_POST['gender'];
+    $Fragile = $_POST['fragile'];
 
     // Kiểm tra xem có người dùng nào được chọn hay không
-    $sql = "SELECT add_card FROM users WHERE id=?";
+    $sql = "SELECT add_card FROM goods WHERE id=?";
     $result = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($result, $sql)) {
         echo "SQL_Error: " . mysqli_error($conn);
         exit();
     } else {
-        mysqli_stmt_bind_param($result, "i", $user_id);
+        mysqli_stmt_bind_param($result, "i", $Good_id);
         mysqli_stmt_execute($result);
         $resultl = mysqli_stmt_get_result($result);
         if ($row = mysqli_fetch_assoc($resultl)) {
             if ($row['add_card'] == 0) {
-                if (!empty($Uname) && !empty($Number) && !empty($Email)) {
+                if (!empty($Gname) && !empty($Number) && !empty($Origin)) {
                     // Kiểm tra nếu đã có người dùng nào có Serial Number giống
-                    $sql = "SELECT serialnumber FROM users WHERE serialnumber=? AND id NOT LIKE ?";
+                    $sql = "SELECT serialnumber FROM goods WHERE serialnumber=? AND id NOT LIKE ?";
                     $result = mysqli_stmt_init($conn);
                     if (!mysqli_stmt_prepare($result, $sql)) {
                         echo "SQL_Error: " . mysqli_error($conn);
                         exit();
                     } else {
-                        mysqli_stmt_bind_param($result, "di", $Number, $user_id);
+                        mysqli_stmt_bind_param($result, "di", $Number, $Good_id);
                         mysqli_stmt_execute($result);
                         $resultl = mysqli_stmt_get_result($result);
                         if (!$row = mysqli_fetch_assoc($resultl)) {
@@ -50,13 +52,13 @@ if (isset($_POST['Add'])) {
                                     $dev_name = "All";
                                 }
                             }
-                            $sql = "UPDATE users SET username=?, serialnumber=?, gender=?, email=?, user_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
+                            $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
                             $result = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($result, $sql)) {
                                 echo "SQL_Error_select_Fingerprint: " . mysqli_error($conn);
                                 exit();
                             } else {
-                                mysqli_stmt_bind_param($result, "sdssssi", $Uname, $Number, $Gender, $Email, $dev_uid, $dev_name, $user_id);
+                                mysqli_stmt_bind_param($result, "sdssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Good_id);
                                 mysqli_stmt_execute($result);
                                 echo 1;
                                 exit();
@@ -71,7 +73,7 @@ if (isset($_POST['Add'])) {
                     exit();
                 }
             } else {
-                echo "This User already exists";
+                echo "This Good already exists";
                 exit();
             }
         } else {
@@ -83,40 +85,40 @@ if (isset($_POST['Add'])) {
 
 // Cập nhật người dùng đã tồn tại
 if (isset($_POST['Update'])) {
-    $user_id = $_POST['user_id'];
-    $Uname = $_POST['name'];
+    $Good_id = $_POST['good_id'];
+    $Gname = $_POST['good'];
     $Number = $_POST['number'];
-    $Email = $_POST['email'];
+    $Origin = $_POST['origin'];
     $dev_uid = $_POST['dev_uid'];
-    $Gender = $_POST['gender'];
+    $Fragile = $_POST['fragile'];
 
     // Kiểm tra nếu người dùng đã được chọn
-    $sql = "SELECT add_card FROM users WHERE id=?";
+    $sql = "SELECT add_card FROM goods WHERE id=?";
     $result = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($result, $sql)) {
         echo "SQL_Error: " . mysqli_error($conn);
         exit();
     } else {
-        mysqli_stmt_bind_param($result, "i", $user_id);
+        mysqli_stmt_bind_param($result, "i", $Good_id);
         mysqli_stmt_execute($result);
         $resultl = mysqli_stmt_get_result($result);
         if ($row = mysqli_fetch_assoc($resultl)) {
             if ($row['add_card'] == 0) {
-                echo "First, You need to add the User!";
+                echo "First, You need to add the Good!";
                 exit();
             } else {
-                if (empty($Uname) && empty($Number) && empty($Email)) {
+                if (empty($Gname) && empty($Number) && empty($Origin)) {
                     echo "Empty Fields";
                     exit();
                 } else {
                     // Kiểm tra nếu đã có người dùng nào có Serial Number giống
-                    $sql = "SELECT serialnumber FROM users WHERE serialnumber=? AND id NOT LIKE ?";
+                    $sql = "SELECT serialnumber FROM goods WHERE serialnumber=? AND id NOT LIKE ?";
                     $result = mysqli_stmt_init($conn);
                     if (!mysqli_stmt_prepare($result, $sql)) {
                         echo "SQL_Error: " . mysqli_error($conn);
                         exit();
                     } else {
-                        mysqli_stmt_bind_param($result, "di", $Number, $user_id);
+                        mysqli_stmt_bind_param($result, "di", $Number, $Good_id);
                         mysqli_stmt_execute($result);
                         $resultl = mysqli_stmt_get_result($result);
                         if (!$row = mysqli_fetch_assoc($resultl)) {
@@ -136,14 +138,14 @@ if (isset($_POST['Update'])) {
                                 }
                             }
 
-                            if (!empty($Uname) && !empty($Email)) {
-                                $sql = "UPDATE users SET username=?, serialnumber=?, gender=?, email=?, device_uid=?, device_dep=? WHERE id=?";
+                            if (!empty($Gname) && !empty($Origin)) {
+                                $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, user_date=CURDATE(), device_uid=?, device_dep=? add_card=1 WHERE id=?";
                                 $result = mysqli_stmt_init($conn);
                                 if (!mysqli_stmt_prepare($result, $sql)) {
                                     echo "SQL_Error_select_Card: " . mysqli_error($conn);
                                     exit();
                                 } else {
-                                    mysqli_stmt_bind_param($result, "sdssssi", $Uname, $Number, $Gender, $Email, $dev_uid, $dev_name, $user_id);
+                                    mysqli_stmt_bind_param($result, "sdssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Good_id);
                                     mysqli_stmt_execute($result);
                                     echo 1;
                                     exit();
@@ -157,7 +159,7 @@ if (isset($_POST['Update'])) {
                 }
             }
         } else {
-            echo "There's no selected User to be updated!";
+            echo "There's no selected Good to be updated!";
             exit();
         }
     }
@@ -167,7 +169,7 @@ if (isset($_POST['Update'])) {
 if (isset($_GET['select'])) {
     $card_uid = $_GET['card_uid'];
 
-    $sql = "SELECT * FROM users WHERE card_uid=?";
+    $sql = "SELECT * FROM goods WHERE card_uid=?";
     $result = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($result, $sql)) {
         echo "SQL_Error_Select: " . mysqli_error($conn);
@@ -176,7 +178,7 @@ if (isset($_GET['select'])) {
         mysqli_stmt_bind_param($result, "s", $card_uid);
         mysqli_stmt_execute($result);
         $resultl = mysqli_stmt_get_result($result);
-        //echo "User Fingerprint selected";
+        //echo "Good Fingerprint selected";
         //exit();
         // Trả về dữ liệu dưới dạng JSON
         header('Content-Type: application/json');
@@ -193,19 +195,19 @@ if (isset($_GET['select'])) {
 
 // Xóa người dùng
 if (isset($_POST['delete'])) {
-    $user_id = $_POST['user_id'];
+    $Good_id = $_POST['good_id'];
 
-    if (empty($user_id)) {
-        echo "There's no selected user to remove";
+    if (empty($Good_id)) {
+        echo "There's no selected good to remove";
         exit();
     } else {
-        $sql = "DELETE FROM users WHERE id=?";
+        $sql = "DELETE FROM goods WHERE id=?";
         $result = mysqli_stmt_init($conn);
         if (!mysqli_stmt_prepare($result, $sql)) {
             echo "SQL_Error_delete: " . mysqli_error($conn);
             exit();
         } else {
-            mysqli_stmt_bind_param($result, "i", $user_id);
+            mysqli_stmt_bind_param($result, "i", $Good_id);
             mysqli_stmt_execute($result);
             echo 1;
             exit();

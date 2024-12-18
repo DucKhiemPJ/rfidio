@@ -1,5 +1,6 @@
-<?php 
 
+
+<?php 
 if (isset($_POST['login'])) {
 
 	require 'connectDB.php';

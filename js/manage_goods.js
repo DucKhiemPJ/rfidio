@@ -1,39 +1,39 @@
 $(document).ready(function(){
   // Add user
-  $(document).on('click', '.user_add', function(){
+  $(document).on('click', '.good_add', function(){
     //user Info
-    var user_id = $('#user_id').val();
-    var name = $('#name').val();
+    var good_id = $('#good_id').val();
+    var good = $('#good').val();
     var number = $('#number').val();
-    var email = $('#email').val();
+    var origin = $('#origin').val();
     //Additional Info
     var dev_uid = $('#dev_uid').val();
-    var gender = $(".gender:checked").val();
+    var fragile = $(".fragile:checked").val();
     var dev_uid = $('#dev_sel option:selected').val();
     
     $.ajax({
-      url: 'manage_users_conf.php',
+      url: 'manage_goods_conf.php',
       type: 'POST',
       data: {
         'Add': 1,
-        'user_id': user_id,
-        'name': name,
+        'good_id': good_id,
+        'good': good,
         'number': number,
-        'email': email,
+        'origin': origin,
         'dev_uid': dev_uid,
-        'gender': gender,
+        'fragile': fragile,
       },
       success: function(response){
 
         if (response == 1) {
-          $('#user_id').val('');
-          $('#name').val('');
+          $('#good_id').val('');
+          $('#good').val('');
           $('#number').val('');
-          $('#email').val('');
+          $('#origin').val('');
 
           $('#dev_sel').val('0');
           $('.alert_user').fadeIn(500);
-          $('.alert_user').html('<p class="alert alert-success">A new User has been successfully added</p>');
+          $('.alert_user').html('<p class="alert alert-success">A new Good has been successfully added</p>');
         }
         else{
           $('.alert_user').fadeIn(500);
@@ -45,48 +45,48 @@ $(document).ready(function(){
         }, 5000);
         
         $.ajax({
-          url: "manage_users_up.php"
+          url: "manage_goods_up.php"
           }).done(function(data) {
-          $('#manage_users').html(data);
+          $('#manage_goods').html(data);
         });
       }
     });
   });
   // Update user
-  $(document).on('click', '.user_upd', function(){
+  $(document).on('click', '.good_upd', function(){
     //user Info
-    var user_id = $('#user_id').val();
-    var name = $('#name').val();
+    var good_id = $('#good_id').val();
+    var good = $('#good').val();
     var number = $('#number').val();
-    var email = $('#email').val();
+    var origin = $('#origin').val();
     //Additional Info
     var dev_uid = $('#dev_uid').val();
-    var gender = $(".gender:checked").val();
+    var fragile = $(".fragile:checked").val();
     var dev_uid = $('#dev_sel option:selected').val();
 
     $.ajax({
-      url: 'manage_users_conf.php',
+      url: 'manage_goods_conf.php',
       type: 'POST',
       data: {
         'Update': 1,
-        'user_id': user_id,
-        'name': name,
+        'good_id': good_id,
+        'good': good,
         'number': number,
-        'email': email,
+        'origin': origin,
         'dev_uid': dev_uid,
-        'gender': gender,
+        'fragile': fragile,
       },
       success: function(response){
 
         if (response == 1) {
-          $('#user_id').val('');
-          $('#name').val('');
+          $('#good_id').val('');
+          $('#good').val('');
           $('#number').val('');
-          $('#email').val('');
+          $('#origin').val('');
 
           $('#dev_sel').val('0');
           $('.alert_user').fadeIn(500);
-          $('.alert_user').html('<p class="alert alert-success">The selected User has been updated!</p>');
+          $('.alert_user').html('<p class="alert alert-success">The selected Good has been updated!</p>');
         }
         else{
           $('.alert_user').fadeIn(500);
@@ -98,38 +98,38 @@ $(document).ready(function(){
         }, 5000);
         
         $.ajax({
-          url: "manage_users_up.php"
+          url: "manage_goods_up.php"
           }).done(function(data) {
-          $('#manage_users').html(data);
+          $('#manage_goods').html(data);
         });
       }
     });   
   });
   // delete user
-  $(document).on('click', '.user_rmo', function(){
+  $(document).on('click', '.good_rmo', function(){
 
-    var user_id = $('#user_id').val();
+    var good_id = $('#good_id').val();
 
-    bootbox.confirm("Do you really want to delete this User?", function(result) {
+    bootbox.confirm("Do you really want to delete this Good?", function(result) {
       if(result){
         $.ajax({
-          url: 'manage_users_conf.php',
+          url: 'manage_goods_conf.php',
           type: 'POST',
           data: {
             'delete': 1,
-            'user_id': user_id,
+            'good_id': good_id,
           },
           success: function(response){
 
             if (response == 1) {
-              $('#user_id').val('');
-              $('#name').val('');
+              $('#good_id').val('');
+              $('#good').val('');
               $('#number').val('');
-              $('#email').val('');
+              $('#origin').val('');
 
               $('#dev_sel').val('0');
               $('.alert_user').fadeIn(500);
-              $('.alert_user').html('<p class="alert alert-success">The selected User has been deleted!</p>');
+              $('.alert_user').html('<p class="alert alert-success">The selected Good has been deleted!</p>');
             }
             else{
               $('.alert_user').fadeIn(500);
@@ -141,9 +141,9 @@ $(document).ready(function(){
             }, 5000);
             
             $.ajax({
-              url: "manage_users_up.php"
+              url: "manage_goods_up.php"
               }).done(function(data) {
-              $('#manage_users').html(data);
+              $('#manage_goods').html(data);
             });
           }
         });
@@ -155,7 +155,7 @@ $(document).ready(function(){
     var el = this;
     var card_uid = $(this).attr("id");
     $.ajax({
-      url: 'manage_users_conf.php',
+      url: 'manage_goods_conf.php',
       type: 'GET',
       data: {
       'select': 1,
@@ -173,56 +173,56 @@ $(document).ready(function(){
         }, 5000);
 
         $.ajax({
-          url: "manage_users_up.php"
+          url: "manage_goods_up.php"
           }).done(function(data) {
-          $('#manage_users').html(data);
+          $('#manage_goods').html(data);
         });
 
         console.log(response);
 
-        var user_id = {
-          User_id : []
+        var good_id = {
+          Good_id : []
         };
-        var user_name = {
-          User_name : []
+        var good = {
+          Good : []
         };
-        var user_on = {
-          User_on : []
+        var good_on = {
+          Good_on : []
         };
-        var user_email = {
-          User_email : []
+        var origin = {
+          Origin : []
         };
-        var user_dev = {
-          User_dev : []
+        var good_dev = {
+          Good_dev : []
         };
-        var user_gender = {
-          User_gender : []
+        var fragile = {
+          Fragile : []
         };
 
         var len = response.length;
 
         for (var i = 0; i < len; i++) {
-            user_id.User_id.push(response[i].id);
-            user_name.User_name.push(response[i].username);
-            user_on.User_on.push(response[i].serialnumber);
-            user_email.User_email.push(response[i].email);
-            user_dev.User_dev.push(response[i].device_uid);
-            user_gender.User_gender.push(response[i].gender);
+            good_id.Good_id.push(response[i].id);
+            good.Good.push(response[i].good);
+            good_on.Good_on.push(response[i].serialnumber);
+            origin.Origin.push(response[i].origin);
+            good_dev.Good_dev.push(response[i].device_uid);
+            fragile.Fragile.push(response[i].fragile);
         }
-        if (user_dev.User_dev == "All") {
-          user_dev.User_dev = 0;
+        if (good_dev.Good_dev == "All") {
+          good_dev.Good_dev = 0;
         }
-        $('#user_id').val(user_id.User_id);
-        $('#name').val(user_name.User_name);
-        $('#number').val(user_on.User_on);
-        $('#email').val(user_email.User_email);
-        $('#dev_sel').val(user_dev.User_dev);
+        $('#good_id').val(good_id.Good_id);
+        $('#good').val(good.Good);
+        $('#number').val(good_on.Good_on);
+        $('#origin').val(origin.Origin);
+        $('#dev_sel').val(good_dev.Good_dev);
 
-        if (user_gender.User_gender == 'Female'){
-            $('.form-style-5').find(':radio[name=gender][value="Female"]').prop('checked', true);
+        if (fragile.Fragile == 'Fragile'){
+            $('.form-style-5').find(':radio[good=fragile][value="Fragile"]').prop('checked', true);
         }
         else{
-            $('.form-style-5').find(':radio[name=gender][value="Male"]').prop('checked', true);
+            $('.form-style-5').find(':radio[good=fragile][value="Non Fragile"]').prop('checked', true);
         }
 
       },

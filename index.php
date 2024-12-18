@@ -1,3 +1,5 @@
+
+
 <?php
 session_start();
 if (!isset($_SESSION['Admin-name'])) {
@@ -14,7 +16,7 @@ if (!isset($_SESSION['Admin-name'])) {
 
     <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/Users.css">
+    <link rel="stylesheet" type="text/css" href="css/Goods.css">
     <script>
       $(window).on("load resize ", function() {
         var scrollWidth = $('.tbl-content').width() - $('.tbl-content table').width();
@@ -34,7 +36,7 @@ if (!isset($_SESSION['Admin-name'])) {
         <tr>
           <th>ID | Goods</th>
           <th>Serial Number</th>
-          <th>Category </th>
+          <th>Fragile </th>
           <th>Card UID</th>
           <th>Date</th>
           <th>Device</th>
@@ -45,7 +47,7 @@ if (!isset($_SESSION['Admin-name'])) {
           //Connect to database
           require'connectDB.php';
 
-            $sql = "SELECT * FROM users WHERE add_card=1 ORDER BY id DESC";
+            $sql = "SELECT * FROM goods WHERE add_card=1 ORDER BY id DESC";
             $result = mysqli_stmt_init($conn);
             if (!mysqli_stmt_prepare($result, $sql)) {
                 echo '<p class="error">SQL Error</p>';
@@ -57,11 +59,11 @@ if (!isset($_SESSION['Admin-name'])) {
                   while ($row = mysqli_fetch_assoc($resultl)){
           ?>
                       <TR>
-                      <TD><?php echo $row['id']; echo" | "; echo $row['username'];?></TD>
+                      <TD><?php echo $row['id']; echo" | "; echo $row['good'];?></TD>
                       <TD><?php echo $row['serialnumber'];?></TD>
-                      <TD><?php echo $row['gender'];?></TD>
+                      <TD><?php echo $row['fragile'];?></TD>
                       <TD><?php echo $row['card_uid'];?></TD>
-                      <TD><?php echo $row['user_date'];?></TD>
+                      <TD><?php echo $row['good_date'];?></TD>
                       <TD><?php echo $row['device_dep'];?></TD>
                       </TR>
         <?php

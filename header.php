@@ -1,3 +1,5 @@
+
+
 <head>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link rel='stylesheet' type='text/css' href="css/bootstrap.css"/>
@@ -56,8 +58,8 @@
 ?>
 <div class="topnav" id="myTopnav">
 	<a href="index.php">Goods</a>
-    <a href="ManageUsers.php">Manage Goods</a>
-    <a href="UsersLog.php">Goods Log</a>
+    <a href="ManageGoods.php">Manage Goods</a>
+    <a href="GoodsLog.php">Goods Log</a>
     <a href="devices.php">Devices</a>
     <?php  
     	if (isset($_SESSION['Admin-name'])) {

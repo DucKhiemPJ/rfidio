@@ -1,6 +1,6 @@
 $(document).ready(function(){
   // Get Report passenger
-  $(document).on('click', '#user_log', function(){
+  $(document).on('click', '#good_log', function(){
 
     var date_sel_start = $('#date_sel_start').val();
     var date_sel_end = $('#date_sel_end').val();
@@ -11,7 +11,7 @@ $(document).ready(function(){
     var dev_uid = $('#dev_sel option:selected').val();
     
     $.ajax({
-      url: 'user_log_up.php',
+      url: 'good_log_up.php',
       type: 'POST',
       data: {
         'log_date': 1,
@@ -32,7 +32,7 @@ $(document).ready(function(){
         }, 5000);
 
         $.ajax({
-          url: "user_log_up.php",
+          url: "good_log_up.php",
           type: 'POST',
           data: {
             'log_date': 1,
@@ -46,7 +46,7 @@ $(document).ready(function(){
             'select_date': 0,
           }
           }).done(function(data) {
-          $('#userslog').html(data);
+          $('#goodslog').html(data);
         });
       }
     });
