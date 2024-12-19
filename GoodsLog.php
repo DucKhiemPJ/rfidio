@@ -1,10 +1,25 @@
-
-
 <?php
 session_start();
 if (!isset($_SESSION['Admin-name'])) {
   header("location: login.php");
 }
+
+// Kết nối cơ sở dữ liệu
+require 'connectDB.php';
+
+// Câu lệnh SQL để đếm số lượng hàng hóa trong bảng goods_logs
+$sql_count = "SELECT COUNT(DISTINCT good) AS total_goods FROM goods_logs WHERE card_out = 1";  // Chỉ đếm các mặt hàng không bị trùng
+$result_count = mysqli_query($conn, $sql_count);
+$row_count = mysqli_fetch_assoc($result_count);
+$total_goods = $row_count['total_goods'];
+
+// Câu lệnh SQL để đếm số lượng hàng hóa trùng lặp theo tên, nếu không trùng thì hiển thị 1
+$sql_duplicates = "SELECT good, 
+                          IF(COUNT(*) > 1, COUNT(*), 1) AS count_duplicates 
+                   FROM goods_logs 
+                   WHERE card_out = 1 
+                   GROUP BY good";
+$result_duplicates = mysqli_query($conn, $sql_duplicates);
 ?>
 <!DOCTYPE html>
 <html>
@@ -12,14 +27,9 @@ if (!isset($_SESSION['Admin-name'])) {
     <title>Goods Logs</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link rel="icon" type="image/png" href="icon/ok_check.png"> -->
     <link rel="stylesheet" type="text/css" href="css/goodslog.css">
-
     <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.js"
-            integrity="sha1256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-            crossorigin="anonymous">
-    </script>   
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>   
     <script type="text/javascript" src="js/bootbox.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.js"></script>
     <script src="js/good_log.js"></script>
@@ -73,129 +83,89 @@ if (!isset($_SESSION['Admin-name'])) {
       });
     });
     </script>
-
 </head>
 <body>
-<?php include'header.php'; ?> 
-<section class="container py-lg-5">>
+<?php include 'header.php'; ?> 
+<section class="container py-lg-5">
   <!--User table-->
-    <h1 class="slideInDown animated">Here are the Goods daily logs</h1>
-    <div class="form-style-5">
-      <button type="button" data-toggle="modal" data-target="#Filter-export">Log Filter/ Export to Excel</button>
-      <input type="checkbox" id="liveToggle" checked> Live Update
-    </div>
-    <!-- Log filter -->
-    <div class="modal fade bd-example-modal-lg" id="Filter-export" tabindex="-1" role="dialog" aria-labelledby="Filter/Export" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg animate" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 class="modal-title" id="exampleModalLongTitle">Filter Your Goods Log:</h3>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <form method="POST" action="Export_Excel.php" enctype="multipart/form-data">
-            <div class="modal-body">
-              <div class="container-fluid">
-                <div class="row">
-                  <div class="col-lg-6 col-sm-6">
-                    <div class="panel panel-primary">
-                      <div class="panel-heading">Filter By Date:</div>
-                      <div class="panel-body">
+  <h1 class="slideInDown animated">Here are the Goods daily logs</h1>
+  <p>Total Number of Goods: <?php echo $total_goods; ?></p> <!-- Hiển thị tổng số hàng hóa -->
+  
+  <!-- Hiển thị số lượng hàng hóa trùng lặp -->
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Product Name</th>
+        <th>Count of Product</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php while ($row = mysqli_fetch_assoc($result_duplicates)) { ?>
+        <tr>
+          <td><?php echo $row['good']; ?></td>
+          <td><?php echo $row['count_duplicates']; ?></td>
+        </tr>
+      <?php } ?>
+    </tbody>
+  </table>
+  
+  <div class="form-style-5">
+    <button type="button" data-toggle="modal" data-target="#Filter-export">Log Filter/ Export to Excel</button>
+    <input type="checkbox" id="liveToggle" checked> Live Update
+  </div>
+  
+  <!-- Log filter -->
+  <div class="modal fade bd-example-modal-lg" id="Filter-export" tabindex="-1" role="dialog" aria-labelledby="Filter/Export" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg animate" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="exampleModalLongTitle">Filter Your Goods Log:</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="POST" action="Export_Excel.php" enctype="multipart/form-data">
+          <div class="modal-body">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-lg-6 col-sm-6">
+                  <div class="panel panel-primary">
+                    <div class="panel-heading">Filter By Date:</div>
+                    <div class="panel-body">
                       <label for="Start-Date"><b>Select from this Date:</b></label>
                       <input type="date" name="date_sel_start" id="date_sel_start">
                       <label for="End -Date"><b>To End of this Date:</b></label>
                       <input type="date" name="date_sel_end" id="date_sel_end">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-lg-6 col-sm-6">
-                    <div class="panel panel-primary">
-                      <div class="panel-heading">
-                          Filter By:
-                        <div class="time">
-                          <input type="radio" id="radio-one" name="time_sel" class="time_sel" value="Time_in" checked/>
-                          <label for="radio-one">Time-in</label>
-                          <input type="radio" id="radio-two" name="time_sel" class="time_sel" value="Time_out" />
-                          <label for="radio-two">Time-out</label>
-                        </div>
-                      </div>
-                      <div class="panel-body">
-                        <label for="Start-Time"><b>Select from this Time:</b></label>
-                        <input type="time" name="time_sel_start" id="time_sel_start">
-                        <label for="End -Time"><b>To End of this Time:</b></label>
-                        <input type="time" name="time_sel_end" id="time_sel_end">
-                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="row">
-                  <div class="col-lg-4 col-sm-12">
-                    <label for="Fingerprint"><b>Filter By Goods:</b></label>
-                    <select class="card_sel" name="card_sel" id="card_sel">
-                      <option value="0">All Goods</option>
-                      <?php
-                        require'connectDB.php';
-                        $sql = "SELECT * FROM goods WHERE add_card=1 ORDER BY id ASC";
-                        $result = mysqli_stmt_init($conn);
-                        if (!mysqli_stmt_prepare($result, $sql)) {
-                            echo '<p class="error">SQL Error</p>';
-                        } 
-                        else{
-                            mysqli_stmt_execute($result);
-                            $resultl = mysqli_stmt_get_result($result);
-                            while ($row = mysqli_fetch_assoc($resultl)){
-                      ?>
-                              <option value="<?php echo $row['card_uid'];?>"><?php echo $row['good']; ?></option>
-                      <?php
-                            }
-                        }
-                      ?>
-                    </select>
-                  </div>
-                  <div class="col-lg-4 col-sm-12">
-                    <label for="Device"><b>Filter By Device department:</b></label>
-                    <select class="dev_sel" name="dev_sel" id="dev_sel">
-                      <option value="0">All Departments</option>
-                      <?php
-                        require'connectDB.php';
-                        $sql = "SELECT * FROM devices ORDER BY device_dep ASC";
-                        $result = mysqli_stmt_init($conn);
-                        if (!mysqli_stmt_prepare($result, $sql)) {
-                            echo '<p class="error">SQL Error</p>';
-                        } 
-                        else{
-                            mysqli_stmt_execute($result);
-                            $resultl = mysqli_stmt_get_result($result);
-                            while ($row = mysqli_fetch_assoc($resultl)){
-                      ?>
-                              <option value="<?php echo $row['device_uid'];?>"><?php echo $row['device_dep']; ?></option>
-                      <?php
-                            }
-                        }
-                      ?>
-                    </select>
-                  </div>
-                  <div class="col-lg-4 col-sm-12">
-                    <label for="Fingerprint"><b>Export to Excel:</b></label>
-                    <input type="submit" name="To_Excel" value="Export">
+                <div class="col-lg-6 col-sm-6">
+                  <div class="panel panel-primary">
+                    <div class="panel-heading">Filter By:</div>
+                    <div class="panel-body">
+                      <label for="Start-Time"><b>Select from this Time:</b></label>
+                      <input type="time" name="time_sel_start" id="time_sel_start">
+                      <label for="End -Time"><b>To End of this Time:</b></label>
+                      <input type="time" name="time_sel_end" id="time_sel_end">
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" name="good_log" id="good_log" class="btn btn-success">Filter</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            </div>
-          </form>
-        </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success">Filter</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
-    <!-- //Log filter -->
-    <div class="slideInRight animated">
-      <div id="goodslog"></div>
-    </div>
+  </div>
+  
+  <!-- //Log filter -->
+  <div class="slideInRight animated">
+    <div id="goodslog"></div>
+  </div>
 </section>
-</main>
 </body>
 </html>
