@@ -83,7 +83,6 @@ if (isset($_POST['Add'])) {
     }
 }
 
-// Cập nhật người dùng đã tồn tại
 if (isset($_POST['Update'])) {
     $Good_id = $_POST['good_id'];
     $Gname = $_POST['good'];
@@ -122,6 +121,7 @@ if (isset($_POST['Update'])) {
                         mysqli_stmt_execute($result);
                         $resultl = mysqli_stmt_get_result($result);
                         if (!$row = mysqli_fetch_assoc($resultl)) {
+                            // Kiểm tra xem tên thiết bị có tồn tại không
                             $sql = "SELECT device_dep FROM devices WHERE device_uid=?";
                             $result = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($result, $sql)) {
@@ -138,18 +138,23 @@ if (isset($_POST['Update'])) {
                                 }
                             }
 
-                            if (!empty($Gname) && !empty($Origin)) {
-                                $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, user_date=CURDATE(), device_uid=?, device_dep=? add_card=1 WHERE id=?";
+                            // Kiểm tra tất cả các trường đầu vào
+                            if (!empty($Gname) && !empty($Origin) && !empty($Number)) {
+                                $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
                                 $result = mysqli_stmt_init($conn);
                                 if (!mysqli_stmt_prepare($result, $sql)) {
                                     echo "SQL_Error_select_Card: " . mysqli_error($conn);
                                     exit();
                                 } else {
+                                    // Bind tham số
                                     mysqli_stmt_bind_param($result, "sdssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Good_id);
                                     mysqli_stmt_execute($result);
                                     echo 1;
                                     exit();
                                 }
+                            } else {
+                                echo "All fields are required!";
+                                exit();
                             }
                         } else {
                             echo "The serial number is already taken!";
@@ -164,6 +169,7 @@ if (isset($_POST['Update'])) {
         }
     }
 }
+
 
 // Chọn người dùng (thẻ)
 if (isset($_GET['select'])) {

@@ -34,9 +34,9 @@ session_start();
 
 					      	$de_mode = '<div class="mode_select">
 					      	<input type="radio" id="'.$row["id"].'-one" name="'.$row["id"].'" class="mode_sel" data-id="'.$row["id"].'" value="0" '.$radio1.'/>
-					                    <label for="'.$row["id"].'-one">Enrollment</label>
+					                    <label for="'.$row["id"].'-one">Registration</label>
 		                    <input type="radio" id="'.$row["id"].'-two" name="'.$row["id"].'" class="mode_sel" data-id="'.$row["id"].'" value="1" '.$radio2.'/>
-					                    <label for="'.$row["id"].'-two">Attendance</label>
+					                    <label for="'.$row["id"].'-two">Tracking</label>
 					                    </div>';
 
 					    	echo '<tr>

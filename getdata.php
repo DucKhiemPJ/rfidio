@@ -1,37 +1,37 @@
-
-
 <?php  
-// Kết nối cơ sở dữ liệu
 require 'connectDB.php';
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 $d = date("Y-m-d");
-$t = date("H:i:sa");
+$t = date("H:i:s");
 
-// Xác thực và lọc tham số GET
+// Xử lý đầu vào
 function sanitize_input($data) {
     return htmlspecialchars(stripslashes(trim($data)));
 }
 
-if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
+if (isset($_GET['card_uid'], $_GET['device_token'])) {
     $card_uid = sanitize_input($_GET['card_uid']);
     $device_uid = sanitize_input($_GET['device_token']);
 
     // Kiểm tra thông tin thiết bị
-    if ($device_info = get_device_info($conn, $device_uid)) {
+    $device_info = get_device_info($conn, $device_uid);
+    if ($device_info) {
         $device_mode = $device_info['device_mode'];
         $device_dep = $device_info['device_dep'];
 
         if ($device_mode == 1) {
             // Chế độ đăng nhập / đăng xuất
-            if ($good_info = get_good_info($conn, $card_uid)) {
+            $good_info = get_good_info($conn, $card_uid);
+            if ($good_info) {
                 handle_good_login_logout($conn, $good_info, $card_uid, $device_uid, $device_dep, $d, $t);
             } else {
-                echo "Not found!";
+                echo "Card not found!";
             }
         } elseif ($device_mode == 0) {
             // Chế độ đăng ký thẻ mới
-            if ($good_info = get_good_info($conn, $card_uid)) {
-                handle_existing_card($conn, $card_uid, $device_uid, $device_dep);
+            $good_info = get_good_info($conn, $card_uid);
+            if ($good_info) {
+                handle_existing_card($conn, $card_uid);
             } else {
                 handle_new_card($conn, $card_uid, $device_uid, $device_dep);
             }
@@ -43,9 +43,9 @@ if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
     echo "Invalid Input!";
 }
 
-// Lấy thông tin thiết bị từ cơ sở dữ liệu
+// Lấy thông tin thiết bị
 function get_device_info($conn, $device_uid) {
-    $sql = "SELECT * FROM devices WHERE device_uid=?";
+    $sql = "SELECT * FROM devices WHERE device_uid = ?";
     $stmt = mysqli_prepare($conn, $sql);
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "s", $device_uid);
@@ -53,14 +53,14 @@ function get_device_info($conn, $device_uid) {
         $result = mysqli_stmt_get_result($stmt);
         return mysqli_fetch_assoc($result);
     } else {
-        error_log("SQL_Error_Select_device");
+        error_log("SQL Error: Failed to fetch device info");
         return false;
     }
 }
 
-// Lấy thông tin người dùng từ cơ sở dữ liệu
+// Lấy thông tin mặt hàng
 function get_good_info($conn, $card_uid) {
-    $sql = "SELECT * FROM goods WHERE card_uid=?";
+    $sql = "SELECT * FROM goods WHERE card_uid = ?";
     $stmt = mysqli_prepare($conn, $sql);
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "s", $card_uid);
@@ -68,47 +68,28 @@ function get_good_info($conn, $card_uid) {
         $result = mysqli_stmt_get_result($stmt);
         return mysqli_fetch_assoc($result);
     } else {
-        error_log("SQL_Error_Select_card");
+        error_log("SQL Error: Failed to fetch good info");
         return false;
     }
 }
 
-// Xử lý đăng nhập và đăng xuất của người dùng
+// Xử lý đăng nhập / đăng xuất
 function handle_good_login_logout($conn, $good_info, $card_uid, $device_uid, $device_dep, $d, $t) {
     if ($good_info['add_card'] == 1) {
         if ($good_info['device_uid'] == $device_uid || $good_info['device_uid'] == 0) {
             $Gname = $good_info['good'];
             $Number = $good_info['serialnumber'];
-
-            $sql = "SELECT * FROM goods_logs WHERE card_uid=? AND checkindate=? AND card_out=0";
-            $stmt = mysqli_prepare($conn, $sql);
-            if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "ss", $card_uid, $d);
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
-                
-                // Đăng nhập
-                if (!mysqli_fetch_assoc($result)) {
-                    insert_good_log($conn, $Gname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, "00:00:00");
-                    echo "login " . $Gname;
-                }
-                // Đăng xuất
-                else {
-                    update_good_log($conn, $card_uid, $d, $t);
-                    echo "logout " . $Gname;
-                }
-            } else {
-                error_log("SQL_Error_Select_logs");
-            }
+            insert_good_log($conn, $Gname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, "00:00:00");
+            echo "Login successful for $Gname (Serial Number: $Number)";
         } else {
-            echo "Not Allowed!";
+            echo "Access Denied!";
         }
     } else {
-        echo "Not registered!";
+        echo "Card not registered!";
     }
 }
 
-// Hàm chèn log người dùng
+// Thêm bản ghi đăng nhập
 function insert_good_log($conn, $Gname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, $timeout) {
     $sql = "INSERT INTO goods_logs (good, serialnumber, card_uid, device_uid, device_dep, checkindate, timein, timeout) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -116,76 +97,43 @@ function insert_good_log($conn, $Gname, $Number, $card_uid, $device_uid, $device
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "sdssssss", $Gname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, $timeout);
         if (!mysqli_stmt_execute($stmt)) {
-            error_log("SQL Error in INSERT: " . mysqli_error($conn));
-        } else {
-            error_log("INSERT successful for card_uid: $card_uid on date: $d at time: $t");
+            error_log("SQL Error: Failed to insert log for card UID $card_uid");
         }
     } else {
-        error_log("SQL Error in INSERT prepare: " . mysqli_error($conn));
+        error_log("SQL Error: Failed to prepare INSERT statement");
     }
 }
 
-
-// Hàm cập nhật log khi đăng xuất
-function update_good_log($conn, $card_uid, $d, $t) {
-    $sql = "UPDATE goods_logs SET timeout=?, card_out=1 WHERE card_uid=? AND checkindate=? AND card_out=0";
-    $stmt = mysqli_prepare($conn, $sql);
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "sss", $t, $card_uid, $d);
-        mysqli_stmt_execute($stmt);
-    } else {
-        error_log("SQL_Error_insert_logout");
-    }
-}
-
-// Hàm xử lý thẻ đã tồn tại
-function handle_existing_card($conn, $card_uid, $device_uid, $device_dep) {
-    $sql = "SELECT card_select FROM goods WHERE card_select=1";
-    $stmt = mysqli_prepare($conn, $sql);
-    if ($stmt) {
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        
-        if (mysqli_fetch_assoc($result)) {
-            update_card_select($conn, $card_uid);
-        } else {
-            update_card_select($conn, $card_uid);
-        }
-    } else {
-        error_log("SQL_Error_Select_card_select");
-    }
-}
-
-// Hàm xử lý thẻ mới
-function handle_new_card($conn, $card_uid, $device_uid, $device_dep) {
-    $sql = "UPDATE goods SET card_select=0";
-    $stmt = mysqli_prepare($conn, $sql);
-    if ($stmt) {
-        mysqli_stmt_execute($stmt);
-        $sql = "INSERT INTO goods (card_uid, card_select, device_uid, device_dep, good_date) VALUES (?, 1, ?, ?, CURDATE())";
-        $stmt = mysqli_prepare($conn, $sql);
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "sss", $card_uid, $device_uid, $device_dep);
-            mysqli_stmt_execute($stmt);
-            echo "successful";
-        } else {
-            error_log("SQL_Error_Select_add_card");
-        }
-    } else {
-        error_log("SQL_Error_insert_default_card_select");
-    }
-}
-
-// Cập nhật trạng thái thẻ được chọn
-function update_card_select($conn, $card_uid) {
-    $sql = "UPDATE goods SET card_select=1 WHERE card_uid=?";
+// Xử lý thẻ đã tồn tại
+function handle_existing_card($conn, $card_uid) {
+    $sql = "UPDATE goods SET card_select = 1 WHERE card_uid = ?";
     $stmt = mysqli_prepare($conn, $sql);
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "s", $card_uid);
-        mysqli_stmt_execute($stmt);
-        echo "available";
+        if (mysqli_stmt_execute($stmt)) {
+            echo "Card updated to selected state!";
+        } else {
+            error_log("SQL Error: Failed to update existing card UID $card_uid");
+        }
     } else {
-        error_log("SQL_Error_update_card_select");
+        error_log("SQL Error: Failed to prepare update for existing card");
+    }
+}
+
+// Xử lý thẻ mới
+function handle_new_card($conn, $card_uid, $device_uid, $device_dep) {
+    $sql = "INSERT INTO goods (card_uid, card_select, device_uid, device_dep, good_date) 
+            VALUES (?, 1, ?, ?, CURDATE())";
+    $stmt = mysqli_prepare($conn, $sql);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "sss", $card_uid, $device_uid, $device_dep);
+        if (mysqli_stmt_execute($stmt)) {
+            echo "New card successfully registered!";
+        } else {
+            error_log("SQL Error: Failed to register new card UID $card_uid");
+        }
+    } else {
+        error_log("SQL Error: Failed to prepare insert for new card");
     }
 }
 ?>

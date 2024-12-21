@@ -1,5 +1,3 @@
-
-
 <?php  
 session_start();
 ?>
@@ -15,6 +13,7 @@ session_start();
         <th>Date</th>
         <th>Time In</th>
         <th>Time Out</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody class="table-secondary">
@@ -98,11 +97,12 @@ session_start();
                   <td><?php echo htmlspecialchars($row['checkindate']); ?></td>
                   <td><?php echo htmlspecialchars($row['timein']); ?></td>
                   <td><?php echo htmlspecialchars($row['timeout']); ?></td>
+                  <td><button onclick="logout(<?php echo $row['id']; ?>)">LogOut</button></td>
                   </tr>
         <?php
                 }
             } else {
-                echo "<tr><td colspan='8'>No records found</td></tr>";
+                echo "<tr><td colspan='9'>No records found</td></tr>";
             }
             mysqli_stmt_close($stmt);
         } else {
@@ -113,3 +113,19 @@ session_start();
     </tbody>
   </table>
 </div>
+
+<script>
+function logout(logId) {
+    // Gửi yêu cầu logout qua AJAX
+    fetch('log.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'log_id=' + logId
+    })
+    .then(response => response.text())
+    .then(data => alert(data))
+    .catch(error => console.error('Error:', error));
+}
+</script>
