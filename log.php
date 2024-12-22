@@ -1,6 +1,9 @@
 <?php
 require 'connectDB.php';
 
+// Đặt múi giờ thành Việt Nam (GMT+7)
+date_default_timezone_set("Asia/Ho_Chi_Minh");
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['log_id'])) {
     $log_id = intval($_POST['log_id']);
     $timeout = date("H:i:s");
