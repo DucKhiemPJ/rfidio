@@ -61,7 +61,7 @@ if (!isset($_SESSION['Admin-name'])) {
 				<input type="text" name="origin" id="origin" placeholder="Good Origin...">
 				<label for="exp_date">Expiration Date:</label>
 				<input type="date" id="exp_date" name="exp_date" placeholder="Date of Expiration (YYYY-MM-DD)">
-				<span>(Please select a valid date e.g., 2024/12/31)</span>
+				<span>(Please select a valid date e.g., 31/12/2024)</span>
 			</fieldset>
 			<fieldset>
 			<legend><span class="number">2</span> Additional Info</legend>
