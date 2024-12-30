@@ -61,6 +61,14 @@ CREATE TABLE `devices` (
 --
 -- Table structure for table `users`
 --
+CREATE TABLE `pwd_reset` (
+  `pwd_reset_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `pwd_reset_email` VARCHAR(255) NOT NULL,
+  `pwd_reset_selector` VARCHAR(255) NOT NULL,
+  `pwd_reset_token` TEXT NOT NULL,
+  `pwd_reset_expires` INT(11) NOT NULL,
+  PRIMARY KEY (`pwd_reset_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `goods` (
   `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -71,6 +79,7 @@ CREATE TABLE `goods` (
   `card_uid` VARCHAR(30) NOT NULL,
   `card_select` TINYINT(1) NOT NULL DEFAULT '0',
   `good_date` DATE NOT NULL,
+  `exp_date` DATE,
   `device_uid` VARCHAR(20) NOT NULL DEFAULT '0',
   `device_dep` VARCHAR(20) NOT NULL DEFAULT '0',
   `add_card` TINYINT(1) NOT NULL DEFAULT '0'

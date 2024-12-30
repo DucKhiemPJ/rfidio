@@ -1,16 +1,17 @@
 $(document).ready(function(){
-  // Add user
+  // Add good
   $(document).on('click', '.good_add', function(){
-    //user Info
+    // Get user input values
     var good_id = $('#good_id').val();
     var good = $('#good').val();
     var number = $('#number').val();
     var origin = $('#origin').val();
-    //Additional Info
+    var exp_date = $('#exp_date').val();  // Get the expiration date value
     var dev_uid = $('#dev_uid').val();
     var fragile = $(".fragile:checked").val();
     var dev_uid = $('#dev_sel option:selected').val();
     
+    // AJAX request to add the good
     $.ajax({
       url: 'manage_goods_conf.php',
       type: 'POST',
@@ -20,18 +21,21 @@ $(document).ready(function(){
         'good': good,
         'number': number,
         'origin': origin,
+        'exp_date': exp_date,  // Add exp_date to the data
         'dev_uid': dev_uid,
         'fragile': fragile,
       },
       success: function(response){
-
         if (response == 1) {
+          // Clear input fields
           $('#good_id').val('');
           $('#good').val('');
           $('#number').val('');
           $('#origin').val('');
-
+          $('#exp_date').val('');  // Clear expiration date field
           $('#dev_sel').val('0');
+
+          // Display success alert
           $('.alert_user').fadeIn(500);
           $('.alert_user').html('<p class="alert alert-success">A new Good has been successfully added</p>');
         }
@@ -44,26 +48,29 @@ $(document).ready(function(){
             $('.alert').fadeOut(500);
         }, 5000);
         
+        // Update the list of goods
         $.ajax({
           url: "manage_goods_up.php"
-          }).done(function(data) {
+        }).done(function(data) {
           $('#manage_goods').html(data);
         });
       }
     });
   });
-  // Update user
+
+  // Update good
   $(document).on('click', '.good_upd', function(){
-    //user Info
+    // Get user input values
     var good_id = $('#good_id').val();
     var good = $('#good').val();
     var number = $('#number').val();
     var origin = $('#origin').val();
-    //Additional Info
+    var exp_date = $('#exp_date').val();  // Get the expiration date value
     var dev_uid = $('#dev_uid').val();
     var fragile = $(".fragile:checked").val();
     var dev_uid = $('#dev_sel option:selected').val();
 
+    // AJAX request to update the good
     $.ajax({
       url: 'manage_goods_conf.php',
       type: 'POST',
@@ -73,18 +80,21 @@ $(document).ready(function(){
         'good': good,
         'number': number,
         'origin': origin,
+        'exp_date': exp_date,  // Add exp_date to the data
         'dev_uid': dev_uid,
         'fragile': fragile,
       },
       success: function(response){
-
         if (response == 1) {
+          // Clear input fields
           $('#good_id').val('');
           $('#good').val('');
           $('#number').val('');
           $('#origin').val('');
-
+          $('#exp_date').val('');  // Clear expiration date field
           $('#dev_sel').val('0');
+
+          // Display success alert
           $('.alert_user').fadeIn(500);
           $('.alert_user').html('<p class="alert alert-success">The selected Good has been updated!</p>');
         }
@@ -96,18 +106,19 @@ $(document).ready(function(){
         setTimeout(function () {
             $('.alert').fadeOut(500);
         }, 5000);
-        
+
+        // Update the list of goods
         $.ajax({
           url: "manage_goods_up.php"
-          }).done(function(data) {
+        }).done(function(data) {
           $('#manage_goods').html(data);
         });
       }
     });   
   });
-  // delete user
-  $(document).on('click', '.good_rmo', function(){
 
+  // Delete good
+  $(document).on('click', '.good_rmo', function(){
     var good_id = $('#good_id').val();
 
     bootbox.confirm("Do you really want to delete this Good?", function(result) {
@@ -120,14 +131,16 @@ $(document).ready(function(){
             'good_id': good_id,
           },
           success: function(response){
-
             if (response == 1) {
+              // Clear input fields
               $('#good_id').val('');
               $('#good').val('');
               $('#number').val('');
               $('#origin').val('');
-
+              $('#exp_date').val('');  // Clear expiration date field
               $('#dev_sel').val('0');
+
+              // Display success alert
               $('.alert_user').fadeIn(500);
               $('.alert_user').html('<p class="alert alert-success">The selected Good has been deleted!</p>');
             }
@@ -135,14 +148,15 @@ $(document).ready(function(){
               $('.alert_user').fadeIn(500);
               $('.alert_user').html('<p class="alert alert-danger">'+ response + '</p>');
             }
-            
+
             setTimeout(function () {
                 $('.alert').fadeOut(500);
             }, 5000);
-            
+
+            // Update the list of goods
             $.ajax({
               url: "manage_goods_up.php"
-              }).done(function(data) {
+            }).done(function(data) {
               $('#manage_goods').html(data);
             });
           }
@@ -150,7 +164,8 @@ $(document).ready(function(){
       }
     });
   });
-  // select user
+
+  // Select good
   $(document).on('click', '.select_btn', function(){
     var el = this;
     var card_uid = $(this).attr("id");
@@ -158,11 +173,10 @@ $(document).ready(function(){
       url: 'manage_goods_conf.php',
       type: 'GET',
       data: {
-      'select': 1,
-      'card_uid': card_uid,
+        'select': 1,
+        'card_uid': card_uid,
       },
       success: function(response){
-
         $(el).closest('tr').css('background','#70c276');
 
         $('.alert_user').fadeIn(500);
@@ -172,13 +186,12 @@ $(document).ready(function(){
             $('.alert').fadeOut(500);
         }, 5000);
 
+        // Update the list of goods
         $.ajax({
           url: "manage_goods_up.php"
-          }).done(function(data) {
+        }).done(function(data) {
           $('#manage_goods').html(data);
         });
-
-        console.log(response);
 
         var good_id = {
           Good_id : []
@@ -198,6 +211,9 @@ $(document).ready(function(){
         var fragile = {
           Fragile : []
         };
+        var exp_date = {
+          Exp_date : []
+        };
 
         var len = response.length;
 
@@ -208,23 +224,23 @@ $(document).ready(function(){
             origin.Origin.push(response[i].origin);
             good_dev.Good_dev.push(response[i].device_uid);
             fragile.Fragile.push(response[i].fragile);
+            exp_date.Exp_date.push(response[i].exp_date);  // Add expiration date to the response
         }
-        if (good_dev.Good_dev == "All") {
-          good_dev.Good_dev = 0;
-        }
+
+        // Fill the form with selected data
         $('#good_id').val(good_id.Good_id);
         $('#good').val(good.Good);
         $('#number').val(good_on.Good_on);
         $('#origin').val(origin.Origin);
         $('#dev_sel').val(good_dev.Good_dev);
+        $('#exp_date').val(exp_date.Exp_date);  // Set the expiration date field
 
         if (fragile.Fragile == 'Fragile'){
             $('.form-style-5').find(':radio[good=fragile][value="Fragile"]').prop('checked', true);
         }
         else{
-            $('.form-style-5').find(':radio[good=fragile][value="Non Fragile"]').prop('checked', true);
+            $('.form-style-5').find(':radio[good=fragile][value="Not Fragile"]').prop('checked', true);
         }
-
       },
       error : function(data) {
         console.log(data);

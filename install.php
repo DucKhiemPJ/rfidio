@@ -28,6 +28,7 @@
 			`serialnumber` double NOT NULL,
 			`gender` varchar(10) NOT NULL,
 			`origin` varchar(50) NOT NULL,
+			`exp_date` date NOT NULL,
 			`fingerprint_id` int(11) NOT NULL,
 			`fingerprint_select` tinyint(1) NOT NULL DEFAULT '0',
 			`good_date` date NOT NULL,

@@ -9,10 +9,10 @@ if (isset($_POST['Add'])) {
     $Good_id = $_POST['good_id'];
     $Gname = $_POST['good'];
     $Number = $_POST['number'];
+    $Exp_date = $_POST['exp_date'];  
     $Origin = $_POST['origin'];
     $dev_uid = $_POST['dev_uid'];
     $Fragile = $_POST['fragile'];
-
     // Kiểm tra xem có người dùng nào được chọn hay không
     $sql = "SELECT add_card FROM goods WHERE id=?";
     $result = mysqli_stmt_init($conn);
@@ -52,13 +52,13 @@ if (isset($_POST['Add'])) {
                                     $dev_name = "All";
                                 }
                             }
-                            $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
+                            $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, exp_date=?, add_card=1 WHERE id=?";
                             $result = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($result, $sql)) {
                                 echo "SQL_Error_select_Fingerprint: " . mysqli_error($conn);
                                 exit();
                             } else {
-                                mysqli_stmt_bind_param($result, "sdssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Good_id);
+                                mysqli_stmt_bind_param($result, "sdsssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
                                 mysqli_stmt_execute($result);
                                 echo 1;
                                 exit();
@@ -87,10 +87,10 @@ if (isset($_POST['Update'])) {
     $Good_id = $_POST['good_id'];
     $Gname = $_POST['good'];
     $Number = $_POST['number'];
+    $Exp_date = $_POST['exp_date'];  
     $Origin = $_POST['origin'];
     $dev_uid = $_POST['dev_uid'];
     $Fragile = $_POST['fragile'];
-
     // Kiểm tra nếu người dùng đã được chọn
     $sql = "SELECT add_card FROM goods WHERE id=?";
     $result = mysqli_stmt_init($conn);
@@ -140,14 +140,14 @@ if (isset($_POST['Update'])) {
 
                             // Kiểm tra tất cả các trường đầu vào
                             if (!empty($Gname) && !empty($Origin) && !empty($Number)) {
-                                $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, add_card=1 WHERE id=?";
+                                $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, exp_date=?, add_card=1 WHERE id=?";
                                 $result = mysqli_stmt_init($conn);
                                 if (!mysqli_stmt_prepare($result, $sql)) {
                                     echo "SQL_Error_select_Card: " . mysqli_error($conn);
                                     exit();
                                 } else {
                                     // Bind tham số
-                                    mysqli_stmt_bind_param($result, "sdssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Good_id);
+                                    mysqli_stmt_bind_param($result, "sdsssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
                                     mysqli_stmt_execute($result);
                                     echo 1;
                                     exit();

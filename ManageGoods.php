@@ -58,7 +58,10 @@ if (!isset($_SESSION['Admin-name'])) {
 				<input type="hidden" name="good_id" id="good_id">
 				<input type="text" name="good" id="good" placeholder="Identify...">
 				<input type="text" name="number" id="number" placeholder="Serial Number...">
-				<input type="text" name="origin" id="origin" placeholder="Good origin...">
+				<input type="text" name="origin" id="origin" placeholder="Good Origin...">
+				<label for="exp_date">Expiration Date:</label>
+				<input type="date" id="exp_date" name="exp_date" placeholder="Date of Expiration (YYYY-MM-DD)">
+				<span>(Please select a valid date e.g., 2024/12/31)</span>
 			</fieldset>
 			<fieldset>
 			<legend><span class="number">2</span> Additional Info</legend>
@@ -84,7 +87,7 @@ if (!isset($_SESSION['Admin-name'])) {
                         }
                       ?>
                     </select>
-				<input type="radio" name="fragile" class="fragile" value="Non Fragile">Non Fragile
+				<input type="radio" name="fragile" class="fragile" value="Not Fragile">Not Fragile
 				<input type="radio" name="fragile" class="fragile" value="Fragile" checked="checked">Fragile
 
 	      	</label >

@@ -164,6 +164,7 @@ if (!isset($_SESSION['Admin-name'])) {
         
         <label for="filter">Filter by:</label>
         <select id="filter" name="filter">
+            <option value="">Any</option>
             <option value="serialnumber">Serial Number</option>
             <option value="device_dep">Device</option>
         </select>
@@ -193,78 +194,114 @@ if (!isset($_SESSION['Admin-name'])) {
       <tr>
         <th>ID | Goods</th>
         <th>Serial Number</th>
+        <th>Origin</th>
         <th>Fragile</th>
         <th>Card UID</th>
-        <th>Date</th>
+        <th>Registered_Date</th>
+        <th>Exp_Date</th>
         <th>Device</th>
       </tr>
     </thead>
     <tbody class="table-secondary">
-      <?php
-        // Kết nối CSDL
-        require 'connectDB.php';
-      
-        // Lấy dữ liệu từ form
-        $search = isset($_GET['search']) ? $_GET['search'] : '';
-        $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
-        $sort = isset($_GET['sort']) ? $_GET['sort'] : 'desc'; // Mặc định là giảm dần
-        $fragile_status = isset($_GET['fragile_status']) ? $_GET['fragile_status'] : ''; // Get fragile status filter
+    <?php
+    require 'connectDB.php';
 
-        // Start building the SQL query
-        $sql = "SELECT * FROM goods WHERE add_card=1"; 
-        $bind_params = []; // Array to hold parameters for binding
-        $types = ''; // String to define the types of parameters (e.g., "s" for string)
+    // Lấy dữ liệu từ form
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
+    $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'desc';
+    $fragile_status = isset($_GET['fragile_status']) ? $_GET['fragile_status'] : '';
 
-        // Thêm điều kiện tìm kiếm nếu có
-        if (!empty($search) && !empty($filter)) {
-            $sql .= " AND $filter LIKE ?"; 
-            $bind_params[] = "%$search%";  // Add search term to bind parameters
-            $types .= 's'; // Add 's' to parameter type for string
-        }
+    // Ánh xạ giá trị từ form sang cơ sở dữ liệu
+    if ($fragile_status === 'yes') {
+        $fragile_status = 'fragile';
+    } elseif ($fragile_status === 'no') {
+        $fragile_status = 'not fragile';
+    }
+    $current_date = date('Y-m-d');
+    // Bắt đầu truy vấn SQL
+    $sql = "SELECT * FROM goods WHERE add_card=1"; 
+    $bind_params = [];
+    $types = '';
 
-        // Add fragile status filter if selected
-        if ($fragile_status !== '') {
-            $sql .= " AND fragile = ?";
-            $bind_params[] = $fragile_status;  // Add fragile_status to bind parameters
-            $types .= 's'; // Add 's' to parameter type for string
-        }
-
-        // Add sorting condition
-        $sql .= " ORDER BY good_date $sort";
-        
-        // Prepare statement
-        $stmt = mysqli_stmt_init($conn);
-        if (!mysqli_stmt_prepare($stmt, $sql)) {
-            echo '<p class="error">SQL Error</p>';
-        } else {
-            // Bind parameters if needed
-            if (!empty($bind_params)) {
-                mysqli_stmt_bind_param($stmt, $types, ...$bind_params);  // Bind all parameters dynamically
-            }
-
-            // Execute query
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-
-            // Check if rows are returned
-            if (mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    ?>
-                    <tr>
-                        <td><?php echo $row['id']; echo " | "; echo $row['good']; ?></td>
-                        <td><?php echo $row['serialnumber']; ?></td>
-                        <td><?php echo $row['fragile']; ?></td>
-                        <td><?php echo $row['card_uid']; ?></td>
-                        <td><?php echo $row['good_date']; ?></td>
-                        <td><?php echo $row['device_dep']; ?></td>
-                    </tr>
-                    <?php
-                }
+    // Thêm điều kiện tìm kiếm
+    if (!empty($search)) {
+        if ($filter === '') { // Nếu filter là "Any", tìm kiếm trên tất cả các cột
+            $sql .= " AND (id LIKE ? OR good LIKE ? OR serialnumber LIKE ? OR fragile LIKE ? OR card_uid LIKE ? OR good_date LIKE ? OR device_dep LIKE ? OR origin LIKE ? OR exp_date LIKE ?)";
+            $bind_params = ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%", "%$search%", "%$search%", "%$search%", "%$search%"];
+            $types = 'sssssssss';
+        } else { // Nếu filter được chọn, tìm kiếm trên cột cụ thể
+            $allowed_filters = ['serialnumber', 'device_dep'];
+            if (in_array($filter, $allowed_filters)) {
+                $sql .= " AND $filter LIKE ?";
+                $bind_params[] = "%$search%";
+                $types .= 's';
             } else {
-                echo "<tr><td colspan='6'>No results found</td></tr>";
+                echo '<p class="error">Invalid filter column.</p>';
+                exit;
             }
         }
-      ?>
+    }
+
+    // Thêm điều kiện fragile nếu có chọn
+    if ($fragile_status !== '') {
+        $sql .= " AND fragile = ?";
+        $bind_params[] = $fragile_status;
+        $types .= 's';
+    }
+
+        // Thêm điều kiện sắp xếp
+    $sql .= " ORDER BY good_date $sort";
+
+    // Chuẩn bị và thực thi truy vấn
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        echo '<p class="error">SQL Error</p>';
+    } else {
+        if (!empty($bind_params)) {
+            mysqli_stmt_bind_param($stmt, $types, ...$bind_params);
+        }
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $exp_date = $row['exp_date']; // Ngày tháng đã được lưu dưới dạng YYYY-MM-DD
+                $current_date = date('Y-m-d'); // Lấy ngày hiện tại theo định dạng YYYY-MM-DD
+
+                // Kiểm tra ngày hết hạn
+                $time_difference = strtotime($exp_date) - strtotime($current_date);
+
+                // Kiểm tra nếu sắp hết hạn trong 3 ngày
+                $is_expiring_soon = $time_difference <= 3 * 24 * 60 * 60 && $time_difference >= 0;
+
+                // Bắt đầu dòng
+                echo "<tr>";
+
+                // Thêm dấu * nếu sắp hết hạn
+                $indicator = $is_expiring_soon ? '*' : '';
+
+                // Các cột dữ liệu
+                echo "<td>{$row['id']} | {$row['good']}{$indicator}</td>";
+                echo "<td>{$row['serialnumber']}</td>";
+                echo "<td>{$row['origin']}</td>";
+                echo "<td>{$row['fragile']}</td>";
+                echo "<td>{$row['card_uid']}</td>";
+                echo "<td>{$row['good_date']}</td>";
+                echo "<td>{$row['exp_date']}</td>";
+                echo "<td>{$row['device_dep']}</td>";                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+
+                // Kết thúc dòng
+                echo "</tr>";
+            }
+        } else {
+            echo "<tr><td colspan='8'>No results found</td></tr>";
+        }
+    }
+    ?>
+
+
+
     </tbody>
   </table>
 </div>
