@@ -219,7 +219,26 @@ if (!isset($_SESSION['Admin-name'])) {
         $fragile_status = 'not fragile';
     }
     $current_date = date('Y-m-d');
-    // Bắt đầu truy vấn SQL
+
+    // Hàm kiểm tra nếu tất cả các bản ghi với serialnumber có timeout
+    function check_all_timeout($conn, $serialnumber) {
+        $sql = "SELECT COUNT(*) FROM goods_logs WHERE serialnumber = ? AND timeout = '1'"; // Giả sử timeout = 1 là đã hết hạn
+        $stmt = mysqli_prepare($conn, $sql);
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "s", $serialnumber);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $count);
+            mysqli_stmt_fetch($stmt);
+            mysqli_stmt_close($stmt);
+            
+            return $count > 0; // Nếu có bản ghi hết hạn, trả về true
+        } else {
+            error_log("SQL Error: Failed to check timeout status for serialnumber $serialnumber");
+            return false;
+        }
+    }
+
+    // Truy vấn bảng goods
     $sql = "SELECT * FROM goods WHERE add_card=1"; 
     $bind_params = [];
     $types = '';
@@ -268,19 +287,20 @@ if (!isset($_SESSION['Admin-name'])) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $exp_date = $row['exp_date']; // Ngày tháng đã được lưu dưới dạng YYYY-MM-DD
                 $current_date = date('Y-m-d'); // Lấy ngày hiện tại theo định dạng YYYY-MM-DD
-
+        
                 // Kiểm tra ngày hết hạn
                 $time_difference = strtotime($exp_date) - strtotime($current_date);
-
-                // Kiểm tra nếu sắp hết hạn trong 3 ngày
+        
+                // Kiểm tra nếu sắp hết hạn trong 3 ngày hoặc đã hết hạn
                 $is_expiring_soon = $time_difference <= 3 * 24 * 60 * 60 && $time_difference >= 0;
-
+                $is_expired = $time_difference < 0;
+        
                 // Bắt đầu dòng
                 echo "<tr>";
-
-                // Thêm dấu * nếu sắp hết hạn
-                $indicator = $is_expiring_soon ? '*' : '';
-
+        
+                // Thêm dấu * nếu sắp hết hạn, # nếu đã hết hạn
+                $indicator = $is_expiring_soon ? '*' : ($is_expired ? '#' : '');
+        
                 // Các cột dữ liệu
                 echo "<td>{$row['id']} | {$row['good']}{$indicator}</td>";
                 echo "<td>{$row['serialnumber']}</td>";
@@ -290,13 +310,13 @@ if (!isset($_SESSION['Admin-name'])) {
                 echo "<td>{$row['good_date']}</td>";
                 echo "<td>{$row['exp_date']}</td>";
                 echo "<td>{$row['device_dep']}</td>";                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-
+        
                 // Kết thúc dòng
                 echo "</tr>";
             }
         } else {
             echo "<tr><td colspan='8'>No results found</td></tr>";
-        }
+        }        
     }
     ?>
 

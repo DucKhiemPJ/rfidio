@@ -7,12 +7,12 @@ session_start();
 	<table class="table">
 		<thead>
 	      <tr>
-	        <th>De.Name</th>
-	        <th>De.Department</th>
-	        <th>De.UID</th>
-	        <th>De.Date</th>
-	        <th>De.Mode</th>
-	        <th>De.Config</th>
+	        <th>Name</th>
+	        <th>Department</th>
+	        <th>UID</th>
+	        <th>Date</th>
+	        <th>Mode</th>
+	        <th>Config</th>
 	      </tr>
     	</thead>
     	<tbody>
@@ -34,9 +34,9 @@ session_start();
 
 					      	$de_mode = '<div class="mode_select">
 					      	<input type="radio" id="'.$row["id"].'-one" name="'.$row["id"].'" class="mode_sel" data-id="'.$row["id"].'" value="0" '.$radio1.'/>
-					                    <label for="'.$row["id"].'-one">Registration</label>
+					                    <label for="'.$row["id"].'-one">Online</label>
 		                    <input type="radio" id="'.$row["id"].'-two" name="'.$row["id"].'" class="mode_sel" data-id="'.$row["id"].'" value="1" '.$radio2.'/>
-					                    <label for="'.$row["id"].'-two">Tracking</label>
+					                    <label for="'.$row["id"].'-two">Offline</label>
 					                    </div>';
 
 					    	echo '<tr>
@@ -58,4 +58,3 @@ session_start();
     	</tbody>
 	</table>
 </div>
-<!-- <button type="button" class="dev_pro_up btn btn-info" id="del_'.$row["id"].'" data-id="'.$row["id"].'"  title="Change this device Project"><span class="glyphicon glyphicon-cog"> </span></button> -->
