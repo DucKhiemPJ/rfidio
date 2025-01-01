@@ -50,6 +50,7 @@
 			`fingerprint_id` int(5) NOT NULL,
 			`checkindate` date NOT NULL,
 			`timein` time NOT NULL,
+			`checkoutdate` date NOT NULL,
 			`timeout` time NOT NULL
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 

@@ -114,12 +114,20 @@ function handle_good_login_logout($conn, $good_info, $card_uid, $device_uid, $de
     }
 }
 
-// Cập nhật bản ghi đăng xuất
+
+// Cập nhật bản ghi đăng xuất và gán checkoutdate là ngày có timeout
 function update_good_log_logout($conn, $card_uid, $d, $t) {
-    $sql = "UPDATE goods_logs SET timeout = ?, card_out = 1 WHERE card_uid = ? AND checkindate = ? AND card_out = 0 LIMIT 1";
+    // Thực hiện cập nhật thời gian timeout và checkoutdate
+    $sql = "UPDATE goods_logs 
+            SET timeout = ?, checkoutdate = ?, card_out = 1 
+            WHERE card_uid = ? AND checkindate = ? AND card_out = 0 LIMIT 1";
+    
     $stmt = mysqli_prepare($conn, $sql);
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "sss", $t, $card_uid, $d);
+        // Liên kết tham số với câu lệnh SQL
+        mysqli_stmt_bind_param($stmt, "ssss", $t, $d, $card_uid, $d);
+        
+        // Thực thi câu lệnh SQL
         if (!mysqli_stmt_execute($stmt)) {
             error_log("SQL Error: Failed to update logout log for card UID $card_uid");
         }
@@ -127,6 +135,7 @@ function update_good_log_logout($conn, $card_uid, $d, $t) {
         error_log("SQL Error: Failed to prepare update for logout");
     }
 }
+
 
 // Thêm bản ghi đăng nhập
 function insert_good_log($conn, $Gname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, $timeout) {

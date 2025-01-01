@@ -10,8 +10,9 @@ session_start();
         <th>Serial Number</th>
         <th>Card UID</th>
         <th>Device Dep</th>
-        <th>Date</th>
+        <th>Check-in Date</th>
         <th>Time In</th>
+        <th>Check-out Date</th>
         <th>Time Out</th>
       </tr>
     </thead>
@@ -95,6 +96,7 @@ session_start();
                   <td><?php echo htmlspecialchars($row['device_dep']); ?></td>
                   <td><?php echo htmlspecialchars($row['checkindate']); ?></td>
                   <td><?php echo htmlspecialchars($row['timein']); ?></td>
+                  <td><?php echo htmlspecialchars($row['checkoutdate']); ?></td>
                   <td><?php echo htmlspecialchars($row['timeout']); ?></td>
                   </tr>
         <?php

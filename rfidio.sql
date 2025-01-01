@@ -64,6 +64,7 @@ CREATE TABLE `goods_logs` (
   `device_dep` VARCHAR(20) NOT NULL,
   `checkindate` DATE NOT NULL,
   `timein` TIME NOT NULL,
+  `checkoutdate` DATE NOT NULL,
   `timeout` TIME NOT NULL DEFAULT '00:00:00',
   `card_out` TINYINT(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
