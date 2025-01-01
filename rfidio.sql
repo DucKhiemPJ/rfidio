@@ -46,7 +46,7 @@ CREATE TABLE `goods` (
   `exp_date` VARCHAR(10),
   `device_uid` VARCHAR(20) NOT NULL DEFAULT '0',
   `device_dep` VARCHAR(20) NOT NULL DEFAULT '0',
-  `add_card` TINYINT(1) NOT NULL DEFAULT '0'
+  `add_card` TINYINT(1) NOT NULL DEFAULT '0',
   `status` VARCHAR(50) NOT NULL DEFAULT 'available'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -67,7 +67,7 @@ CREATE TABLE `goods_logs` (
   `timein` TIME NOT NULL,
   `checkoutdate` DATE NOT NULL,
   `timeout` TIME NOT NULL DEFAULT '00:00:00',
-  `card_out` TINYINT(1) NOT NULL DEFAULT 0,
+  `card_out` TINYINT(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 COMMIT;
