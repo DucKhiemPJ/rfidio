@@ -97,7 +97,7 @@ session_start();
                   <td><?php echo htmlspecialchars($row['checkindate']); ?></td>
                   <td><?php echo htmlspecialchars($row['timein']); ?></td>
                   <td><?php echo htmlspecialchars($row['timeout']); ?></td>
-                  <td><button onclick="logout(<?php echo $row['id']; ?>)">LogOut</button></td>
+                  <td><button onclick="logout(<?php echo $row['id']; ?>)" class = "btn" style = "font-weight: 500;">EXPORT</button></td>
                   </tr>
         <?php
                 }

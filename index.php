@@ -11,7 +11,7 @@ if (!isset($_SESSION['Admin-name'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="images/favicon.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Thêm Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.js"></script>
     <link rel="stylesheet" type="text/css" href="css/Goods.css">
@@ -133,8 +133,14 @@ if (!isset($_SESSION['Admin-name'])) {
   <!-- Tổng hợp số lượng hàng hóa -->
   <div class="summary-section slideInRight animated">
   <div class="summary-section slideInRight animated" style="text-align: center;">
-  <h3>Status</h3>
-  <button onclick="loadGoodsSummary()">Refresh</button>
+  <h3>STATUS</h3>
+  <button onclick="loadGoodsSummary()" class="btn"
+  style = "margin-bottom: 10px;  text-decoration: none; box-shadow: 5px 5px 7px rgba(82, 82, 82, 0.3);
+  background-color: #46abb9;
+  color: #000;
+  border: none;
+  display: inline-block;
+  border-radius: 0px">Refresh</button>
 </div>
 
     
@@ -155,34 +161,44 @@ if (!isset($_SESSION['Admin-name'])) {
 
   <div class="summary-section slideInRight animated">
   <div class="summary-section slideInRight animated" style="text-align: center;">
-  <h3>Registered Goods</h3>
+  <h3>REGISTERED GOODS</h3>
 </div>
   <div class="search-section">
     <form method="GET" action="">
         <label for="search">Search:</label>
-        <input type="text" id="search" name="search" placeholder="Enter search keyword">
+        <input type="text" id="search" name="search" placeholder="Enter search keyword" style = "padding: 4px; margin-bottom: 10px; background-color: #46abb9;
+  color: #000; border: none;">
         
         <label for="filter">Filter by:</label>
-        <select id="filter" name="filter">
+        <select id="filter" name="filter" style = "padding: 6px; margin-bottom: 10px; background-color: #46abb9;
+  color: #000; border: none;">
             <option value="">Any</option>
             <option value="serialnumber">Serial Number</option>
             <option value="device_dep">Device</option>
         </select>
         
         <label for="fragile_status">Fragile Status:</label>
-        <select id="fragile_status" name="fragile_status">
+        <select id="fragile_status" name="fragile_status" style = "padding: 6px; margin-bottom: 10px; background-color: #46abb9;
+  color: #000; border: none;">
             <option value="">Any</option>
             <option value="yes">Fragile</option>
             <option value="no">Not Fragile</option>
         </select>
         
         <label for="sort">Sort by Date:</label>
-        <select id="sort" name="sort">
-            <option value="asc">Descending</option>
-            <option value="desc">Ascending</option>
+        <select id="sort" name="sort" style = "padding: 6px; margin-bottom: 10px; background-color: #46abb9;
+  color: #000; border: none; ">
+            <option value="asc" style = "padding: 10px">Descending</option>
+            <option value="desc" style = "padding: 10px" >Ascending</option>
         </select>
         
-        <button type="submit">Search</button>
+        <button type="submit" class = "btn" 
+        style = "margin:0 0 2px 8px;  text-decoration: none;  box-shadow: 5px 5px 7px rgba(82, 82, 82, 0.3);
+        background-color: #46abb9;
+        color: #000;
+        border: none;
+        border-radius: 0px;
+        display: inline-block;">Search</button>
     </form>
 </div>
 
@@ -220,26 +236,9 @@ if (!isset($_SESSION['Admin-name'])) {
     }
     $current_date = date('Y-m-d');
 
-    // Hàm kiểm tra nếu tất cả các bản ghi với serialnumber có timeout
-    function check_all_timeout($conn, $serialnumber) {
-        $sql = "SELECT COUNT(*) FROM goods_logs WHERE serialnumber = ? AND timeout = '1'"; // Giả sử timeout = 1 là đã hết hạn
-        $stmt = mysqli_prepare($conn, $sql);
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "s", $serialnumber);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_bind_result($stmt, $count);
-            mysqli_stmt_fetch($stmt);
-            mysqli_stmt_close($stmt);
-            
-            return $count > 0; // Nếu có bản ghi hết hạn, trả về true
-        } else {
-            error_log("SQL Error: Failed to check timeout status for serialnumber $serialnumber");
-            return false;
-        }
-    }
-
-    // Truy vấn bảng goods
-    $sql = "SELECT * FROM goods WHERE add_card=1"; 
+    
+    // Bắt đầu truy vấn SQL
+    $sql = "SELECT * FROM goods WHERE add_card=1 AND status = 'available'";
     $bind_params = [];
     $types = '';
 
@@ -287,20 +286,19 @@ if (!isset($_SESSION['Admin-name'])) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $exp_date = $row['exp_date']; // Ngày tháng đã được lưu dưới dạng YYYY-MM-DD
                 $current_date = date('Y-m-d'); // Lấy ngày hiện tại theo định dạng YYYY-MM-DD
-        
+
                 // Kiểm tra ngày hết hạn
                 $time_difference = strtotime($exp_date) - strtotime($current_date);
-        
-                // Kiểm tra nếu sắp hết hạn trong 3 ngày hoặc đã hết hạn
+
+                // Kiểm tra nếu sắp hết hạn trong 3 ngày
                 $is_expiring_soon = $time_difference <= 3 * 24 * 60 * 60 && $time_difference >= 0;
-                $is_expired = $time_difference < 0;
-        
+
                 // Bắt đầu dòng
                 echo "<tr>";
-        
-                // Thêm dấu * nếu sắp hết hạn, # nếu đã hết hạn
-                $indicator = $is_expiring_soon ? '*' : ($is_expired ? '#' : '');
-        
+
+                // Thêm dấu * nếu sắp hết hạn
+                $indicator = $is_expiring_soon ? '*' : '';
+
                 // Các cột dữ liệu
                 echo "<td>{$row['id']} | {$row['good']}{$indicator}</td>";
                 echo "<td>{$row['serialnumber']}</td>";
@@ -310,13 +308,13 @@ if (!isset($_SESSION['Admin-name'])) {
                 echo "<td>{$row['good_date']}</td>";
                 echo "<td>{$row['exp_date']}</td>";
                 echo "<td>{$row['device_dep']}</td>";                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-        
+
                 // Kết thúc dòng
                 echo "</tr>";
             }
         } else {
             echo "<tr><td colspan='8'>No results found</td></tr>";
-        }        
+        }
     }
     ?>
 

@@ -1,67 +1,63 @@
-
-
-<?php  
+<?php
 // Kết nối đến cơ sở dữ liệu
 require 'connectDB.php';
 
-// Thêm người dùng
+// Thêm hàng hóa
 if (isset($_POST['Add'])) {
     $Good_id = $_POST['good_id'];
     $Gname = $_POST['good'];
     $Number = $_POST['number'];
-    $Exp_date = $_POST['exp_date'];  
+    $Exp_date = $_POST['exp_date'];
     $Origin = $_POST['origin'];
     $dev_uid = $_POST['dev_uid'];
     $Fragile = $_POST['fragile'];
-    // Kiểm tra xem có người dùng nào được chọn hay không
+
+    // Kiểm tra xem hàng hóa có tồn tại không
     $sql = "SELECT add_card FROM goods WHERE id=?";
-    $result = mysqli_stmt_init($conn);
-    if (!mysqli_stmt_prepare($result, $sql)) {
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
         echo "SQL_Error: " . mysqli_error($conn);
         exit();
     } else {
-        mysqli_stmt_bind_param($result, "i", $Good_id);
-        mysqli_stmt_execute($result);
-        $resultl = mysqli_stmt_get_result($result);
-        if ($row = mysqli_fetch_assoc($resultl)) {
+        mysqli_stmt_bind_param($stmt, "i", $Good_id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        if ($row = mysqli_fetch_assoc($result)) {
             if ($row['add_card'] == 0) {
                 if (!empty($Gname) && !empty($Number) && !empty($Origin)) {
-                    // Kiểm tra nếu đã có người dùng nào có Serial Number giống
+                    // Kiểm tra trùng Serial Number
                     $sql = "SELECT serialnumber FROM goods WHERE serialnumber=? AND id NOT LIKE ?";
-                    $result = mysqli_stmt_init($conn);
-                    if (!mysqli_stmt_prepare($result, $sql)) {
+                    $stmt = mysqli_stmt_init($conn);
+                    if (!mysqli_stmt_prepare($stmt, $sql)) {
                         echo "SQL_Error: " . mysqli_error($conn);
                         exit();
                     } else {
-                        mysqli_stmt_bind_param($result, "di", $Number, $Good_id);
-                        mysqli_stmt_execute($result);
-                        $resultl = mysqli_stmt_get_result($result);
-                        if (!$row = mysqli_fetch_assoc($resultl)) {
+                        mysqli_stmt_bind_param($stmt, "si", $Number, $Good_id);
+                        mysqli_stmt_execute($stmt);
+                        $result = mysqli_stmt_get_result($stmt);
+                        if (!$row = mysqli_fetch_assoc($result)) {
                             $sql = "SELECT device_dep FROM devices WHERE device_uid=?";
-                            $result = mysqli_stmt_init($conn);
-                            if (!mysqli_stmt_prepare($result, $sql)) {
+                            $stmt = mysqli_stmt_init($conn);
+                            if (!mysqli_stmt_prepare($stmt, $sql)) {
                                 echo "SQL_Error: " . mysqli_error($conn);
                                 exit();
                             } else {
-                                mysqli_stmt_bind_param($result, "s", $dev_uid);
-                                mysqli_stmt_execute($result);
-                                $resultl = mysqli_stmt_get_result($result);
-                                if ($row = mysqli_fetch_assoc($resultl)) {
-                                    $dev_name = $row['device_dep'];
+                                mysqli_stmt_bind_param($stmt, "s", $dev_uid);
+                                mysqli_stmt_execute($stmt);
+                                $result = mysqli_stmt_get_result($stmt);
+                                $dev_name = ($row = mysqli_fetch_assoc($result)) ? $row['device_dep'] : "All";
+
+                                $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, exp_date=?, add_card=1 WHERE id=?";
+                                $stmt = mysqli_stmt_init($conn);
+                                if (!mysqli_stmt_prepare($stmt, $sql)) {
+                                    echo "SQL_Error_select_Fingerprint: " . mysqli_error($conn);
+                                    exit();
                                 } else {
-                                    $dev_name = "All";
+                                    mysqli_stmt_bind_param($stmt, "sssssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
+                                    mysqli_stmt_execute($stmt);
+                                    echo 1;
+                                    exit();
                                 }
-                            }
-                            $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, exp_date=?, add_card=1 WHERE id=?";
-                            $result = mysqli_stmt_init($conn);
-                            if (!mysqli_stmt_prepare($result, $sql)) {
-                                echo "SQL_Error_select_Fingerprint: " . mysqli_error($conn);
-                                exit();
-                            } else {
-                                mysqli_stmt_bind_param($result, "sdsssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
-                                mysqli_stmt_execute($result);
-                                echo 1;
-                                exit();
                             }
                         } else {
                             echo "The serial number is already taken!";
@@ -83,84 +79,72 @@ if (isset($_POST['Add'])) {
     }
 }
 
+// Cập nhật hàng hóa
 if (isset($_POST['Update'])) {
     $Good_id = $_POST['good_id'];
     $Gname = $_POST['good'];
     $Number = $_POST['number'];
-    $Exp_date = $_POST['exp_date'];  
+    $Exp_date = $_POST['exp_date'];
     $Origin = $_POST['origin'];
     $dev_uid = $_POST['dev_uid'];
     $Fragile = $_POST['fragile'];
-    // Kiểm tra nếu người dùng đã được chọn
+
     $sql = "SELECT add_card FROM goods WHERE id=?";
-    $result = mysqli_stmt_init($conn);
-    if (!mysqli_stmt_prepare($result, $sql)) {
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
         echo "SQL_Error: " . mysqli_error($conn);
         exit();
     } else {
-        mysqli_stmt_bind_param($result, "i", $Good_id);
-        mysqli_stmt_execute($result);
-        $resultl = mysqli_stmt_get_result($result);
-        if ($row = mysqli_fetch_assoc($resultl)) {
+        mysqli_stmt_bind_param($stmt, "i", $Good_id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        if ($row = mysqli_fetch_assoc($result)) {
             if ($row['add_card'] == 0) {
                 echo "First, You need to add the Good!";
                 exit();
             } else {
-                if (empty($Gname) && empty($Number) && empty($Origin)) {
-                    echo "Empty Fields";
-                    exit();
-                } else {
-                    // Kiểm tra nếu đã có người dùng nào có Serial Number giống
+                if (!empty($Gname) && !empty($Number) && !empty($Origin)) {
                     $sql = "SELECT serialnumber FROM goods WHERE serialnumber=? AND id NOT LIKE ?";
-                    $result = mysqli_stmt_init($conn);
-                    if (!mysqli_stmt_prepare($result, $sql)) {
+                    $stmt = mysqli_stmt_init($conn);
+                    if (!mysqli_stmt_prepare($stmt, $sql)) {
                         echo "SQL_Error: " . mysqli_error($conn);
                         exit();
                     } else {
-                        mysqli_stmt_bind_param($result, "di", $Number, $Good_id);
-                        mysqli_stmt_execute($result);
-                        $resultl = mysqli_stmt_get_result($result);
-                        if (!$row = mysqli_fetch_assoc($resultl)) {
-                            // Kiểm tra xem tên thiết bị có tồn tại không
+                        mysqli_stmt_bind_param($stmt, "si", $Number, $Good_id);
+                        mysqli_stmt_execute($stmt);
+                        $result = mysqli_stmt_get_result($stmt);
+                        if (!$row = mysqli_fetch_assoc($result)) {
                             $sql = "SELECT device_dep FROM devices WHERE device_uid=?";
-                            $result = mysqli_stmt_init($conn);
-                            if (!mysqli_stmt_prepare($result, $sql)) {
+                            $stmt = mysqli_stmt_init($conn);
+                            if (!mysqli_stmt_prepare($stmt, $sql)) {
                                 echo "SQL_Error: " . mysqli_error($conn);
                                 exit();
                             } else {
-                                mysqli_stmt_bind_param($result, "s", $dev_uid);
-                                mysqli_stmt_execute($result);
-                                $resultl = mysqli_stmt_get_result($result);
-                                if ($row = mysqli_fetch_assoc($resultl)) {
-                                    $dev_name = $row['device_dep'];
-                                } else {
-                                    $dev_name = "All";
-                                }
-                            }
+                                mysqli_stmt_bind_param($stmt, "s", $dev_uid);
+                                mysqli_stmt_execute($stmt);
+                                $result = mysqli_stmt_get_result($stmt);
+                                $dev_name = ($row = mysqli_fetch_assoc($result)) ? $row['device_dep'] : "All";
 
-                            // Kiểm tra tất cả các trường đầu vào
-                            if (!empty($Gname) && !empty($Origin) && !empty($Number)) {
-                                $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, exp_date=?, add_card=1 WHERE id=?";
-                                $result = mysqli_stmt_init($conn);
-                                if (!mysqli_stmt_prepare($result, $sql)) {
+                                $sql = "UPDATE goods SET good=?, serialnumber=?, fragile=?, origin=?, good_date=CURDATE(), device_uid=?, device_dep=?, exp_date=? WHERE id=?";
+                                $stmt = mysqli_stmt_init($conn);
+                                if (!mysqli_stmt_prepare($stmt, $sql)) {
                                     echo "SQL_Error_select_Card: " . mysqli_error($conn);
                                     exit();
                                 } else {
-                                    // Bind tham số
-                                    mysqli_stmt_bind_param($result, "sdsssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
-                                    mysqli_stmt_execute($result);
+                                    mysqli_stmt_bind_param($stmt, "sssssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
+                                    mysqli_stmt_execute($stmt);
                                     echo 1;
                                     exit();
                                 }
-                            } else {
-                                echo "All fields are required!";
-                                exit();
                             }
                         } else {
                             echo "The serial number is already taken!";
                             exit();
                         }
                     }
+                } else {
+                    echo "All fields are required!";
+                    exit();
                 }
             }
         } else {
@@ -170,36 +154,31 @@ if (isset($_POST['Update'])) {
     }
 }
 
-
-// Chọn người dùng (thẻ)
+// Chọn hàng hóa
 if (isset($_GET['select'])) {
     $card_uid = $_GET['card_uid'];
 
     $sql = "SELECT * FROM goods WHERE card_uid=?";
-    $result = mysqli_stmt_init($conn);
-    if (!mysqli_stmt_prepare($result, $sql)) {
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
         echo "SQL_Error_Select: " . mysqli_error($conn);
         exit();
     } else {
-        mysqli_stmt_bind_param($result, "s", $card_uid);
-        mysqli_stmt_execute($result);
-        $resultl = mysqli_stmt_get_result($result);
-        //echo "Good Fingerprint selected";
-        //exit();
-        // Trả về dữ liệu dưới dạng JSON
+        mysqli_stmt_bind_param($stmt, "s", $card_uid);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
         header('Content-Type: application/json');
         $data = array();
-        if ($row = mysqli_fetch_assoc($resultl)) {
-            foreach ($resultl as $row){
-                $data[] = $row;}
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data[] = $row;
         }
-        $resultl->close();
-        $conn->close();
-        print json_encode($data);  // Trả về JSON
+        echo json_encode($data);
+        exit();
     }
 }
 
-// Xóa người dùng
+// Xóa hàng hóa
 if (isset($_POST['delete'])) {
     $Good_id = $_POST['good_id'];
 
@@ -208,13 +187,13 @@ if (isset($_POST['delete'])) {
         exit();
     } else {
         $sql = "DELETE FROM goods WHERE id=?";
-        $result = mysqli_stmt_init($conn);
-        if (!mysqli_stmt_prepare($result, $sql)) {
+        $stmt = mysqli_stmt_init($conn);
+        if (!mysqli_stmt_prepare($stmt, $sql)) {
             echo "SQL_Error_delete: " . mysqli_error($conn);
             exit();
         } else {
-            mysqli_stmt_bind_param($result, "i", $Good_id);
-            mysqli_stmt_execute($result);
+            mysqli_stmt_bind_param($stmt, "i", $Good_id);
+            mysqli_stmt_execute($stmt);
             echo 1;
             exit();
         }

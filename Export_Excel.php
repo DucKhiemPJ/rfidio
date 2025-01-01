@@ -1,117 +1,82 @@
-
-
 <?php
-//Connect to database
-require'connectDB.php';
+require 'connectDB.php';
 
-$output = '';
+if (isset($_POST["To_Excel"])) {
+    $searchQuery = "1=1"; // Mặc định lấy tất cả dữ liệu
+    $output = '';
 
-if(isset($_POST["To_Excel"])){
-  
-    $searchQuery = " ";
-    $Start_date = " ";
-    $End_date = " ";
-    $Start_time = " ";
-    $End_time = " ";
-    $card_sel = " ";
-
-    //Start date filter
-    if ($_POST['date_sel_start'] != 0) {
+    // Start date filter
+    if (!empty($_POST['date_sel_start'])) {
         $Start_date = $_POST['date_sel_start'];
-        $_SESSION['searchQuery'] = "checkindate='".$Start_date."'";
+        $searchQuery .= " AND checkindate >= '$Start_date'";
     }
-    else{
-        $Start_date = date("Y-m-d");
-        $_SESSION['searchQuery'] = "checkindate='".date("Y-m-d")."'";
-    }
-    //End date filter
-    if ($_POST['date_sel_end'] != 0) {
+    // End date filter
+    if (!empty($_POST['date_sel_end'])) {
         $End_date = $_POST['date_sel_end'];
-        $_SESSION['searchQuery'] = "checkindate BETWEEN '".$Start_date."' AND '".$End_date."'";
+        $searchQuery .= " AND checkindate <= '$End_date'";
     }
-    //Time-In filter
-    if ($_POST['time_sel'] == "Time_in") {
-      //Start time filter
-      if ($_POST['time_sel_start'] != 0 && $_POST['time_sel_end'] == 0) {
-          $Start_time = $_POST['time_sel_start'];
-          $_SESSION['searchQuery'] .= " AND timein='".$Start_time."'";
-      }
-      elseif ($_POST['time_sel_start'] != 0 && $_POST['time_sel_end'] != 0) {
-          $Start_time = $_POST['time_sel_start'];
-      }
-      //End time filter
-      if ($_POST['time_sel_end'] != 0) {
-          $End_time = $_POST['time_sel_end'];
-          $_SESSION['searchQuery'] .= " AND timein BETWEEN '".$Start_time."' AND '".$End_time."'";
-      }
+    // Time filter
+    if (!empty($_POST['time_sel'])) {
+        $timeField = $_POST['time_sel'] == 'Time_in' ? 'timein' : 'timeout';
+        if (!empty($_POST['time_sel_start'])) {
+            $Start_time = $_POST['time_sel_start'];
+            $searchQuery .= " AND $timeField >= '$Start_time'";
+        }
+        if (!empty($_POST['time_sel_end'])) {
+            $End_time = $_POST['time_sel_end'];
+            $searchQuery .= " AND $timeField <= '$End_time'";
+        }
     }
-    //Time-out filter
-    if ($_POST['time_sel'] == "Time_out") {
-      //Start time filter
-      if ($_POST['time_sel_start'] != 0 && $_POST['time_sel_end'] == 0) {
-          $Start_time = $_POST['time_sel_start'];
-          $_SESSION['searchQuery'] .= " AND timeout='".$Start_time."'";
-      }
-      elseif ($_POST['time_sel_start'] != 0 && $_POST['time_sel_end'] != 0) {
-          $Start_time = $_POST['time_sel_start'];
-      }
-      //End time filter
-      if ($_POST['time_sel_end'] != 0) {
-          $End_time = $_POST['time_sel_end'];
-          $_SESSION['searchQuery'] .= " AND timeout BETWEEN '".$Start_time."' AND '".$End_time."'";
-      }
-    }
-    //Card filter
-    if ($_POST['card_sel'] != 0) {
+    // Card filter
+    if (!empty($_POST['card_sel']) && $_POST['card_sel'] != '0') {
         $card_sel = $_POST['card_sel'];
-        $_SESSION['searchQuery'] .= " AND card_uid='".$card_sel."'";
+        $searchQuery .= " AND card_uid = '$card_sel'";
     }
-    //Department filter
-    if ($_POST['dev_sel'] != 0) {
+    // Device filter
+    if (!empty($_POST['dev_sel']) && $_POST['dev_sel'] != '0') {
         $dev_uid = $_POST['dev_sel'];
-        $_SESSION['searchQuery'] .= " AND device_uid='".$dev_uid."'";
+        $searchQuery .= " AND device_uid = '$dev_uid'";
     }
 
-    $sql = "SELECT * FROM goods_logs WHERE ".$_SESSION['searchQuery']." ORDER BY id DESC";
+    $sql = "SELECT * FROM goods_logs WHERE $searchQuery ORDER BY id DESC";
     $result = mysqli_query($conn, $sql);
-    if($result->num_rows > 0){
-      $output .= '
-                  <table class="table" bordered="1">  
-                    <TR>
-                      <TH>ID</TH>
-                      <TH>Goods</TH>
-                      <TH>Serial Number</TH>
-                      <TH>Card UID</TH>
-                      <TH>Device ID</TH>
-                      <TH>Device Dep</TH>
-                      <TH>Date log</TH>
-                      <TH>Time In</TH>
-                      <TH>Time Out</TH>
-                    </TR>';
-        while($row=$result->fetch_assoc()) {
+
+    if ($result && $result->num_rows > 0) {
+        $output .= '
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Goods</th>
+                <th>Serial Number</th>
+                <th>Card UID</th>
+                <th>Device ID</th>
+                <th>Device Dep</th>
+                <th>Date log</th>
+                <th>Time In</th>
+                <th>Time Out</th>
+            </tr>';
+        while ($row = $result->fetch_assoc()) {
             $output .= '
-                        <TR> 
-                            <TD> '.$row['id'].'</TD>
-                            <TD> '.$row['good'].'</TD>
-                            <TD> '.$row['serialnumber'].'</TD>
-                            <TD> '.$row['card_uid'].'</TD>
-                            <TD> '.$row['device_uid'].'</TD>
-                            <TD> '.$row['device_dep'].'</TD>
-                            <TD> '.$row['checkindate'].'</TD>
-                            <TD> '.$row['timein'].'</TD>
-                            <TD> '.$row['timeout'].'</TD>
-                        </TR>';
+            <tr>
+                <td>' . $row['id'] . '</td>
+                <td>' . $row['good'] . '</td>
+                <td>' . $row['serialnumber'] . '</td>
+                <td>' . $row['card_uid'] . '</td>
+                <td>' . $row['device_uid'] . '</td>
+                <td>' . $row['device_dep'] . '</td>
+                <td>' . $row['checkindate'] . '</td>
+                <td>' . $row['timein'] . '</td>
+                <td>' . $row['timeout'] . '</td>
+            </tr>';
         }
         $output .= '</table>';
+
         header('Content-Type: application/xls');
-        header('Content-Disposition: attachment; filename=User_Log'.$Start_date.'.xls');
-        
+        header('Content-Disposition: attachment; filename=Goods_Log_' . date('Ymd') . '.xls');
         echo $output;
         exit();
-    }
-    else{
-      header( "location: GoodsLog.php" );
-      exit();
+    } else {
+        echo "No records found!";
     }
 }
 ?>

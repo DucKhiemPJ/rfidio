@@ -1,4 +1,4 @@
-<?php   
+<?php  
 require 'connectDB.php';
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 $d = date("Y-m-d");
@@ -16,36 +16,31 @@ if (isset($_GET['card_uid'], $_GET['device_token'])) {
     // Kiểm tra thông tin thiết bị
     $device_info = get_device_info($conn, $device_uid);
     if ($device_info) {
-        $device_mode = $device_info['device_mode']; // 1: Offline, 0: Online
+        $device_mode = $device_info['device_mode'];
         $device_dep = $device_info['device_dep'];
 
-        if ($device_mode == 0) { // Trạng thái Online
+        if ($device_mode == 1) {
+            // Chế độ đăng nhập / đăng xuất
             $good_info = get_good_info($conn, $card_uid);
             if ($good_info) {
-                // Nếu thẻ đã tồn tại → Đăng nhập bình thường
                 handle_good_login_logout($conn, $good_info, $card_uid, $device_uid, $device_dep, $d, $t);
             } else {
-                // Nếu thẻ mới → Đăng ký và chỉ thông báo đăng ký thành công
+                echo "Card not found!";
+            }
+        } elseif ($device_mode == 0) {
+            // Chế độ đăng ký thẻ mới
+            $good_info = get_good_info($conn, $card_uid);
+            if ($good_info) {
+                handle_existing_card($conn, $card_uid);
+            } else {
                 handle_new_card($conn, $card_uid, $device_uid, $device_dep);
             }
-        } elseif ($device_mode == 1) { // Trạng thái Offline
-            // Gửi phản hồi về trạng thái offline
-            echo json_encode([
-                "status" => "offline",
-                "message" => "Device is in offline mode. RFID scanner is disabled."
-            ]);
         }
     } else {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Invalid Device!"
-        ]);
+        echo "Invalid Device!";
     }
 } else {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Invalid Input!"
-    ]);
+    echo "Invalid Input!";
 }
 
 // Lấy thông tin thiết bị
@@ -90,7 +85,7 @@ function handle_good_login_logout($conn, $good_info, $card_uid, $device_uid, $de
             echo "Access Denied!";
         }
     } else {
-        echo "Please registered!";
+        echo "Card not registered!";
     }
 }
 
@@ -100,12 +95,28 @@ function insert_good_log($conn, $Gname, $Number, $card_uid, $device_uid, $device
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $sql);
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "sdssssss", $Gname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, $timeout);
+        mysqli_stmt_bind_param($stmt, "ssssssss", $Gname, $Number, $card_uid, $device_uid, $device_dep, $d, $t, $timeout);
         if (!mysqli_stmt_execute($stmt)) {
             error_log("SQL Error: Failed to insert log for card UID $card_uid");
         }
     } else {
         error_log("SQL Error: Failed to prepare INSERT statement");
+    }
+}
+
+// Xử lý thẻ đã tồn tại
+function handle_existing_card($conn, $card_uid) {
+    $sql = "UPDATE goods SET card_select = 1 WHERE card_uid = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "s", $card_uid);
+        if (mysqli_stmt_execute($stmt)) {
+            echo "Card updated to selected state!";
+        } else {
+            error_log("SQL Error: Failed to update existing card UID $card_uid");
+        }
+    } else {
+        error_log("SQL Error: Failed to prepare update for existing card");
     }
 }
 
@@ -117,7 +128,6 @@ function handle_new_card($conn, $card_uid, $device_uid, $device_dep) {
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "sss", $card_uid, $device_uid, $device_dep);
         if (mysqli_stmt_execute($stmt)) {
-            // Chỉ thông báo đăng ký thành công
             echo "New card successfully registered!";
         } else {
             error_log("SQL Error: Failed to register new card UID $card_uid");

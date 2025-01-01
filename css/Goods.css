@@ -53,6 +53,15 @@ section {
   animation-fill-mode: both;
 }
 
+/* bổ sung */
+body .btn:hover{
+  box-shadow: 10px 10px 10px rgba(0,0,0,0.3);
+}
+
+input::placeholder{
+  color: #000;
+}
+
 @keyframes slideInRight {
   from {
     transform: translate3d(100%, 0, 0);
