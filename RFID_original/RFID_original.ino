@@ -16,9 +16,7 @@ const char* device_token = "6b132ce979d9aba0";
 
 String URL = "http://192.168.1.4/rfidio/getdata.php"; // IP server
 String oldCardID = "";
-unsigned long previousMillis = 0;
 
-bool isScannerEnabled = true; // Trạng thái máy quét
 
 void setup() {
   Serial.begin(115200);
@@ -40,18 +38,6 @@ void loop() {
     connectToWiFi();
   }
 
-  checkDeviceMode(); // Kiểm tra trạng thái thiết bị
-
-  if (!isScannerEnabled) {
-    Serial.println("RFID scanner is disabled.");
-    delay(1000); // Chờ trong chế độ offline
-    return;
-  }
-
-  if (millis() - previousMillis >= 15000) {
-    previousMillis = millis();
-    oldCardID = "";
-  }
 
   if (!mfrc522.PICC_IsNewCardPresent()) {
     return; // Không có thẻ
@@ -96,8 +82,16 @@ void sendCardID(String card_uid) {
         Serial.println("Data sent successfully!");
         Serial.println(payload);
 
-        if (payload.indexOf("Login successful") >= 0 || payload.indexOf("New card successfully registered") >= 0) {
-          Serial.println("Action successful! Triggering buzzer...");
+        // Kiểm tra nếu trả về thông báo "log in" hoặc "log out"
+        if (payload.indexOf("Login") >= 0) {
+          digitalWrite(BUZZER_PIN, HIGH);
+          delay(500);
+          digitalWrite(BUZZER_PIN, LOW);
+        } else if (payload.indexOf("Logout") >= 0) {
+          digitalWrite(BUZZER_PIN, HIGH);
+          delay(500);
+          digitalWrite(BUZZER_PIN, LOW);
+        } else if (payload.indexOf("New card successfully registered!") >= 0) {
           digitalWrite(BUZZER_PIN, HIGH);
           delay(500);
           digitalWrite(BUZZER_PIN, LOW);
@@ -130,31 +124,4 @@ void connectToWiFi() {
   Serial.println("\nConnected to Wi-Fi");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-}
-
-void checkDeviceMode() {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    String checkURL = URL + "?device_token=" + device_token;
-    http.begin(checkURL);  // Kết nối tới server
-    int httpCode = http.GET();  // Gửi GET request
-    String payload = http.getString();  // Nhận phản hồi từ server
-
-    if (httpCode == HTTP_CODE_OK) {
-      Serial.println("Device status fetched successfully!");
-      Serial.println(payload);
-
-      if (payload.indexOf("\"status\":\"offline\"") >= 0) {
-        Serial.println("Device is offline. Disabling RFID scanner...");
-        isScannerEnabled = false;
-      } else if (payload.indexOf("\"status\":\"online\"") >= 0) {
-        Serial.println("Device is online. Enabling RFID scanner...");
-        isScannerEnabled = true;
-      }
-    } else {
-      Serial.println("Error fetching device status.");
-    }
-
-    http.end();
-  }
 }
