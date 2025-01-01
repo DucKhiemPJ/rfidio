@@ -47,7 +47,7 @@ CREATE TABLE `goods` (
   `device_uid` VARCHAR(20) NOT NULL DEFAULT '0',
   `device_dep` VARCHAR(20) NOT NULL DEFAULT '0',
   `add_card` TINYINT(1) NOT NULL DEFAULT '0'
-  `status` VARCHAR(50) NOT NULL DEFAULT 'avaiable'
+  `status` VARCHAR(50) NOT NULL DEFAULT 'available'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
