@@ -33,7 +33,7 @@ if (isset($_POST['Add'])) {
                         echo "SQL_Error: " . mysqli_error($conn);
                         exit();
                     } else {
-                        mysqli_stmt_bind_param($result, "di", $Number, $Good_id);
+                        mysqli_stmt_bind_param($result, "si", $Number, $Good_id);
                         mysqli_stmt_execute($result);
                         $resultl = mysqli_stmt_get_result($result);
                         if (!$row = mysqli_fetch_assoc($resultl)) {
@@ -58,7 +58,7 @@ if (isset($_POST['Add'])) {
                                 echo "SQL_Error_select_Fingerprint: " . mysqli_error($conn);
                                 exit();
                             } else {
-                                mysqli_stmt_bind_param($result, "sdsssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
+                                mysqli_stmt_bind_param($result, "sssssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
                                 mysqli_stmt_execute($result);
                                 echo 1;
                                 exit();
@@ -117,7 +117,7 @@ if (isset($_POST['Update'])) {
                         echo "SQL_Error: " . mysqli_error($conn);
                         exit();
                     } else {
-                        mysqli_stmt_bind_param($result, "di", $Number, $Good_id);
+                        mysqli_stmt_bind_param($result, "si", $Number, $Good_id);
                         mysqli_stmt_execute($result);
                         $resultl = mysqli_stmt_get_result($result);
                         if (!$row = mysqli_fetch_assoc($resultl)) {
@@ -147,7 +147,7 @@ if (isset($_POST['Update'])) {
                                     exit();
                                 } else {
                                     // Bind tham số
-                                    mysqli_stmt_bind_param($result, "sdsssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
+                                    mysqli_stmt_bind_param($result, "sssssssi", $Gname, $Number, $Fragile, $Origin, $dev_uid, $dev_name, $Exp_date, $Good_id);
                                     mysqli_stmt_execute($result);
                                     echo 1;
                                     exit();

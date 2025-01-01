@@ -37,7 +37,7 @@ CREATE TABLE `pwd_reset` (
 CREATE TABLE `goods` (
   `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `good` VARCHAR(30) NOT NULL DEFAULT 'None',
-  `serialnumber` DOUBLE NOT NULL DEFAULT '0',
+  `serialnumber` VARCHAR(50) NOT NULL DEFAULT '0',
   `fragile` VARCHAR(11) NOT NULL DEFAULT 'None',
   `origin` VARCHAR(50) NOT NULL DEFAULT 'None',
   `card_uid` VARCHAR(30) NOT NULL,
@@ -47,6 +47,7 @@ CREATE TABLE `goods` (
   `device_uid` VARCHAR(20) NOT NULL DEFAULT '0',
   `device_dep` VARCHAR(20) NOT NULL DEFAULT '0',
   `add_card` TINYINT(1) NOT NULL DEFAULT '0'
+  `status` VARCHAR(50) NOT NULL DEFAULT 'avaiable'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -58,7 +59,7 @@ CREATE TABLE `goods` (
 CREATE TABLE `goods_logs` (
   `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `good` VARCHAR(100) NOT NULL,
-  `serialnumber` BIGINT NOT NULL,
+  `serialnumber` VARCHAR(50) NOT NULL,
   `card_uid` VARCHAR(30) NOT NULL,
   `device_uid` VARCHAR(20) NOT NULL,
   `device_dep` VARCHAR(20) NOT NULL,
@@ -66,7 +67,7 @@ CREATE TABLE `goods_logs` (
   `timein` TIME NOT NULL,
   `checkoutdate` DATE NOT NULL,
   `timeout` TIME NOT NULL DEFAULT '00:00:00',
-  `card_out` TINYINT(1) NOT NULL DEFAULT 0
+  `card_out` TINYINT(1) NOT NULL DEFAULT 0,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 COMMIT;

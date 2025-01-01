@@ -134,7 +134,12 @@ if (!isset($_SESSION['Admin-name'])) {
   <div class="summary-section slideInRight animated">
   <div class="summary-section slideInRight animated" style="text-align: center;">
   <h3>Status</h3>
-  <button onclick="loadGoodsSummary()">Refresh</button>
+  <button onclick="loadGoodsSummary()" class = "btn" style = "margin-bottom: 10px;  text-decoration: none; box-shadow: 5px 5px 7px rgba(82, 82, 82, 0.3);
+  background-color: #46abb9;
+  color: #000;
+  border: none;
+  display: inline-block;
+  border-radius: 0px">Refresh</button>
 </div>
 
     
@@ -160,29 +165,39 @@ if (!isset($_SESSION['Admin-name'])) {
   <div class="search-section">
     <form method="GET" action="">
         <label for="search">Search:</label>
-        <input type="text" id="search" name="search" placeholder="Enter search keyword">
+        <input type="text" id="search" name="search" placeholder="Enter search keyword" style = "padding: 4px; margin-bottom: 10px; background-color: #46abb9;
+  color: #000; border: none;">
         
         <label for="filter">Filter by:</label>
-        <select id="filter" name="filter">
+        <select id="filter" name="filter" style = "padding: 6px; margin-bottom: 10px; background-color: #46abb9;
+  color: #000; border: none;">
             <option value="">Any</option>
             <option value="serialnumber">Serial Number</option>
             <option value="device_dep">Device</option>
         </select>
         
         <label for="fragile_status">Fragile Status:</label>
-        <select id="fragile_status" name="fragile_status">
+        <select id="fragile_status" name="fragile_status" style = "padding: 6px; margin-bottom: 10px; background-color: #46abb9;
+  color: #000; border: none;">
             <option value="">Any</option>
             <option value="yes">Fragile</option>
             <option value="no">Not Fragile</option>
         </select>
         
         <label for="sort">Sort by Date:</label>
-        <select id="sort" name="sort">
-            <option value="asc">Descending</option>
-            <option value="desc">Ascending</option>
+        <select id="sort" name="sort" style = "padding: 6px; margin-bottom: 10px; background-color: #46abb9;
+  color: #000; border: none;>
+            <option value="asc"  style = "padding: 10px" >Descending</option>
+            <option value="desc" style = "padding: 10px" >Ascending</option>
         </select>
         
-        <button type="submit">Search</button>
+        <button type="submit" class = "btn" 
+        style = "margin:0 0 2px 8px;  text-decoration: none;  box-shadow: 5px 5px 7px rgba(82, 82, 82, 0.3);
+        background-color: #46abb9;
+        color: #000;
+        border: none;
+        border-radius: 0px;
+        display: inline-block;">Search</button>
     </form>
 </div>
 
@@ -239,7 +254,7 @@ if (!isset($_SESSION['Admin-name'])) {
     }
 
     // Truy vấn bảng goods
-    $sql = "SELECT * FROM goods WHERE add_card=1"; 
+    $sql = "SELECT * FROM goods WHERE add_card=1 AND status = 'available'"; 
     $bind_params = [];
     $types = '';
 
